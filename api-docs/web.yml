@@ -1,0 +1,2220 @@
+openapi: 3.0.0
+info:
+  title: web
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+  - url: https://dev.schoolryde.com
+  - url: https://api.schoolryde.com
+  - url: http://localhost:3000/schools
+  - url: http://localhost:3000/school
+  - url: http://localhost:3000/students
+  - url: http://localhost:3000/payment
+  - url: http://localhost:3000/payment
+  - url: http://localhost:3000/web
+tags:
+  - name: school interest register
+  - name: school
+  - name: student
+  - name: parent
+  - name: payments
+  - name: other api's
+paths:
+  /interest/register/create:
+    post:
+      tags:
+        - school interest register
+      summary: create / save a new record
+      description: >-
+        The `POST /schools/interest/register/create` endpoint is used to
+        register interest for a school. The request should include the following
+        parameters in the raw request body:
+
+
+        - `firstName` (string): The first name of the person registering
+        interest.
+            
+        - `lastName` (string): The last name of the person registering interest.
+            
+        - `email` (string): The email address of the person registering
+        interest.
+            
+        - `phoneNumber` (string): The phone number of the person registering
+        interest.
+            
+        - `city` (string): The city of the person registering interest.
+            
+        - `role` (string): The role of the person registering interest, which
+        can be either "driver" or "parent".
+            
+
+        The response of this request is a JSON schema, which will define the
+        structure of the response object returned by the API.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                firstName: sample first name sdasda
+                lastName: sample last name
+                email: sample12@gmail.com
+                phoneNumber: '+639064808012'
+                city: sample city
+                role: driver
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /interest/register/getVerified:
+    get:
+      tags:
+        - school interest register
+      summary: verified interest users
+      description: |-
+        ### Get Verified School Interest Registration
+
+        This endpoint retrieves verified school interest registration details.
+
+        #### Request
+
+        - Method: GET
+            
+        - URL: `localhost:3000/schools/interest/register/getVerified`
+            
+
+        #### Response
+
+        The response for this request can be documented as a JSON schema.
+
+        ``` json
+        {
+          "type": "object",
+          "properties": {
+            "registrationId": {
+              "type": "string",
+              "description": "The unique identifier for the registration"
+            },
+            "schoolName": {
+              "type": "string",
+              "description": "The name of the school"
+            },
+            "contactPerson": {
+              "type": "string",
+              "description": "The name of the contact person"
+            },
+            "contactEmail": {
+              "type": "string",
+              "description": "The email of the contact person"
+            },
+            "status": {
+              "type": "string",
+              "description": "The status of the registration"
+            }
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /interest/register/verify:
+    post:
+      tags:
+        - school interest register
+      summary: verify interest users
+      description: >-
+        This endpoint allows users to verify their interest in registering for a
+        school. The HTTP POST request should be sent to
+        localhost:3000/schools/interest/register/verify.
+
+
+        ### Request Body
+
+
+        The request should include the following parameters:
+
+
+        - `user_id` (text): The ID of the user who is verifying their interest.
+            
+        - `verification_code` (text): The verification code provided to the
+        user.
+            
+
+        ### Response
+
+
+        Upon successful verification, the response will include a status message
+        confirming the successful verification.
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get/{id}:
+    get:
+      tags:
+        - school
+      summary: get school by id
+      description: >-
+        ### Get School Details
+
+
+        This endpoint retrieves the details of a specific school identified by
+        the provided ID.
+
+
+        #### Request Parameters
+
+
+        - `id`: The unique identifier of the school.
+            
+
+        #### Response
+
+
+        The response will include the following details for the school:
+
+
+        - `name`: The name of the school.
+            
+        - `location`: The location of the school.
+            
+        - `students`: The number of students in the school.
+            
+        - `teachers`: The number of teachers in the school.
+            
+        - `facilities`: The facilities available at the school.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get/{name}:
+    get:
+      tags:
+        - school
+      summary: get school by name
+      description: |-
+        ### Get School by Name
+
+        This endpoint retrieves information about a school by its name.
+
+        #### Request
+
+        - Method: GET
+            
+        - URL: `localhost:3000/schools/get/:name`
+            
+        - Path Parameters:
+            
+            - `name`: The name of the school to retrieve.
+                
+
+        #### Response
+
+        The response will be a JSON object with the following schema:
+
+        ``` json
+        {
+          "type": "object",
+          "properties": {
+            "schoolName": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "students": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "age": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: name
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /download/template:
+    get:
+      tags:
+        - school
+      summary: get template
+      description: >-
+        ### GET /schools/download/template
+
+
+        This endpoint is used to download a template for schools.
+
+
+        #### Request
+
+
+        No request body is required for this endpoint.
+
+
+        #### Response
+
+
+        The response for this request is a JSON schema describing the structure
+        of the template for schools.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /create:
+    post:
+      tags:
+        - school
+      summary: add school
+      description: >-
+        ### Create New School
+
+
+        This endpoint allows the creation of a new school.
+
+
+        #### Request Body
+
+
+        - `firstName` (string) - The first name of the contact person for the
+        school.
+            
+        - `lastName` (string) - The last name of the contact person for the
+        school.
+            
+        - `phoneNumber` (string) - The phone number of the contact person for
+        the school.
+            
+        - `email` (string) - The email address of the contact person for the
+        school.
+            
+        - `password` (string) - The password for the school account.
+            
+        - `schoolName` (string) - The name of the school.
+            
+        - `schoolAddress` (string) - The address of the school.
+            
+        - `country` (string) - The country where the school is located.
+            
+        - `state` (string) - The state where the school is located.
+            
+        - `city` (string) - The city where the school is located.
+            
+        - `zipCode` (string) - The zip code of the school's location.
+            
+
+        #### Response
+
+
+        The response is a JSON object with the schema:
+
+
+        ``` json
+
+        {
+          "status": "string",
+          "message": "string",
+          "schoolId": "string"
+        }
+
+         ```
+
+        - `status` (string) - The status of the response.
+            
+        - `message` (string) - A message indicating the result of the request.
+            
+        - `schoolId` (string) - The unique identifier of the newly created
+        school.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                firstName: andrian
+                lastName: andrian
+                phoneNumber: '+6390648080'
+                email: andrian12@treelinktechnologies.com
+                password: password
+                schoolName: philippine elementary school
+                schoolAddress: philippines
+                country: philippines
+                state: south cotabato
+                city: gensan
+                zipCode: '9505'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /verify:
+    post:
+      tags:
+        - school
+      summary: verify school
+      description: >-
+        ### Verify School
+
+
+        This endpoint is used to verify a school using a POST request to the
+        specified URL.
+
+
+        #### Request Body
+
+
+        - `token` (string) - The verification token.
+            
+        - `email` (string) - The email associated with the school.
+            
+
+        #### Response
+
+
+        The response will contain the verification status of the school.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                token: '6705'
+                email: diana+3@treelinktechnologies.com
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /register:
+    post:
+      tags:
+        - school
+      summary: schools register
+      description: >-
+        This endpoint is used to register a new school. The request should be
+        sent as an HTTP POST to the specified URL. The request body should
+        contain the following parameters in JSON format:
+
+
+        - firstName (string): The first name of the contact person for the
+        school.
+            
+        - lastName (string): The last name of the contact person for the school.
+            
+        - email (string): The email address of the contact person for the
+        school.
+            
+        - phoneNumber (string): The phone number of the contact person for the
+        school.
+            
+        - schoolName (string): The name of the school.
+            
+        - schoolAddress (string): The address of the school.
+            
+        - country (string): The country where the school is located.
+            
+        - state (string): The state where the school is located.
+            
+        - city (string): The city where the school is located.
+            
+        - zipCode (string): The zip code of the school's location.
+            
+        - role (string): The role of the contact person for the school.
+            
+
+        The response of this request will be in JSON format and should adhere to
+        the following schema:  
+
+        {  
+
+        "type": "object",  
+
+        "properties": {  
+
+        "status": {  
+
+        "type": "string"  
+
+        },  
+
+        "message": {  
+
+        "type": "string"  
+
+        },  
+
+        "data": {  
+
+        "type": "object",  
+
+        "properties": {  
+
+        "schoolId": {  
+
+        "type": "string"  
+
+        }  
+
+        }  
+
+        }  
+
+        }  
+
+        }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                firstName: sample firstName
+                lastName: sample lastName
+                email: andrian@gmail.com
+                phoneNumber: '+6390648080'
+                schoolName: sample schoolName
+                schoolAddress: sample school Address
+                country: sample country
+                state: sample state
+                city: sample city
+                zipCode: sample zipcode
+                role: driver
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /interest:
+    post:
+      tags:
+        - school
+      summary: schools interest
+      description: >-
+        ### POST /schools/interest
+
+
+        This endpoint is used to express interest in a school by providing the
+        user's email.
+
+
+        #### Request Body
+
+
+        - email (string, required): The email of the user expressing interest in
+        the school.
+            
+
+        #### Response
+
+
+        The response for this request will be a JSON object conforming to the
+        following schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: sample@gmail.com
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /edit/{id}:
+    post:
+      tags:
+        - school
+      summary: edit school by id
+      description: >-
+        ### Edit School Details
+
+
+        This endpoint allows you to edit the details of a specific school.
+
+
+        #### Request Body
+
+
+        - `firstName` (string): The first name of the school contact person.
+            
+        - `lastName` (string): The last name of the school contact person.
+            
+        - `phoneNumber` (string): The phone number of the school contact person.
+            
+        - `email` (string): The email address of the school contact person.
+            
+        - `password` (string): The password for the school account.
+            
+        - `schoolName` (string): The name of the school.
+            
+        - `schoolAddress` (string): The address of the school.
+            
+        - `country` (string): The country where the school is located.
+            
+        - `state` (string): The state where the school is located.
+            
+        - `city` (string): The city where the school is located.
+            
+        - `zipCode` (string): The zip code of the school location.
+            
+
+        #### Response
+
+
+        The response will contain the updated details of the school after the
+        edit operation.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                firstName: andrian
+                lastName: andrian
+                phoneNumber: '+6390648080'
+                email: andrian12@treelinktechnologies.com
+                password: password
+                schoolName: philippine elementary school
+                schoolAddress: philippines
+                country: philippines
+                state: south cotabato
+                city: gensan
+                zipCode: '9505'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /send/sms:
+    post:
+      tags:
+        - school
+      summary: send sms to driver and parent
+      description: >-
+        ### Send SMS to School
+
+
+        This endpoint allows you to send an SMS to a school.
+
+
+        #### Request Body
+
+
+        - phoneNumber (string, required): The phone number to which the SMS will
+        be sent.
+            
+
+        #### Response
+
+
+        The response for this request is a JSON object with the following
+        schema:
+
+
+        ``` json
+
+        {
+          "status": "string",
+          "message": "string"
+        }
+
+         ```
+
+        - status (string): The status of the SMS sending process.
+            
+        - message (string): A message indicating the result of the SMS sending
+        process.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                phoneNumber: '+6390648080'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /bulk/upload:
+    post:
+      tags:
+        - school
+      summary: bulk upload
+      description: >-
+        ### Upload Bulk Schools Data
+
+
+        This endpoint allows the user to upload bulk data for schools.
+
+
+        #### Request Body
+
+
+        - `students` (file): This parameter should contain the file with the
+        data of the students to be uploaded.
+            
+
+        #### Response
+
+
+        The response for this request follows the JSON schema below:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                students:
+                  type: string
+                  format: binary
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /change/password:
+    post:
+      tags:
+        - school
+      summary: changepassword
+      description: >-
+        The `schools/change/password` endpoint is a POST request used to change
+        the password for a specific school. The request requires the `schoolId`,
+        `oldPassword`, and `newPassword` to be provided in the request body as a
+        JSON payload.
+
+
+        ### Request Body
+
+
+        - `schoolId` (string): The unique identifier of the school for which the
+        password is being changed.
+            
+        - `oldPassword` (string): The current password of the school.
+            
+        - `newPassword` (string): The new password that the school wishes to
+        set.
+            
+
+        ### Response
+
+
+        The response of this request is a JSON schema representing the structure
+        of the response data. This schema will define the properties and their
+        data types that can be expected in the response from the server.
+
+
+        Example of a JSON schema for the response:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+
+        This JSON schema outlines the expected structure of the response, with
+        properties such as `status` and `message` and their respective data
+        types.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                schoolId: sample schoold id
+                oldPassword: sample old password
+                newPassword: sample new password
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{id}:
+    delete:
+      tags:
+        - student
+      summary: delete
+      description: >-
+        ### Delete Student by ID
+
+
+        This endpoint is used to delete a specific student by their ID.
+
+
+        #### Request
+
+
+        - Method: DELETE
+            
+        - Endpoint: `localhost:3000/students/:id`
+            
+        - Path Parameters
+            
+            - `id` (string, required): The unique identifier of the student to be deleted.
+                
+
+        #### Response
+
+
+        The response for this request is a JSON schema describing the success or
+        failure of the deletion operation. The schema will include properties
+        such as `success` to indicate whether the deletion was successful, and
+        `message` to provide additional information about the operation.
+
+
+        Example Response:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - student
+      summary: edit
+      description: >-
+        ### Update Student Information
+
+
+        This endpoint is used to update the information of a specific student.
+
+
+        #### Request Body
+
+
+        - `dateCreated` (string): The date when the student record was created.
+            
+        - `motherName` (string): The name of the student's mother.
+            
+        - `birthDate` (string): The birth date of the student.
+            
+        - `studentName` (string): The name of the student.
+            
+        - `fatherEmailAddress` (string): Email address of the student's father.
+            
+        - `schoolName` (string): The name of the student's school.
+            
+        - `country` (string): The country where the student resides.
+            
+        - `city` (string): The city where the student resides.
+            
+        - `studentEmail` (string): Email address of the student.
+            
+        - `imageUrl` (string): URL of the student's image.
+            
+        - `userId` (string): The unique identifier of the user associated with
+        the student.
+            
+        - `disabilityCondition` (string): The disability condition of the
+        student.
+            
+        - `id` (string): The unique identifier of the student.
+            
+        - `fatherPhoneNumber` (string): Phone number of the student's father.
+            
+        - `isInvited` (boolean): Indicates whether the student has been invited.
+            
+        - `age` (integer): The age of the student.
+            
+        - `studentDisability` (string): Indicates if the student has a
+        disability.
+            
+        - `fatherName` (string): The name of the student's father.
+            
+        - `grade` (string): The grade/class of the student.
+            
+        - `imageBase64` (string): Base64 encoded image of the student.
+            
+        - `otherAssistance` (string): Any other assistance provided to the
+        student.
+            
+        - `motherEmailAddress` (string): Email address of the student's mother.
+            
+        - `shareRide` (boolean): Indicates if the student shares a ride.
+            
+        - `address` (string): The address of the student.
+            
+        - `gender` (string): The gender of the student.
+            
+        - `note` (string): Any additional notes related to the student.
+            
+        - `studentDescription` (string): Description of the student.
+            
+        - `motherPhoneNumber` (string): Phone number of the student's mother.
+            
+        - `paymentMethod` (string): The payment method for the student.
+            
+        - `drivers` (array): List of drivers associated with the student.
+            
+        - `studentPhoneNumber` (string): Phone number of the student.
+            
+
+        #### Response Body
+
+
+        ``` json
+
+        {
+          "message": "Student information updated successfully",
+          "student": {
+            "id": "38ef14fd-44ce-4b6b-ab86-a3dc52...",
+            "studentName": "Dylan Sprouse test",
+            "updatedAt": "2024-04-27T12:00:00Z"
+          }
+        }
+
+         ```
+
+        The response includes a message confirming the successful update of the
+        student information, along with the updated student's ID, name, and the
+        timestamp of the update.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                dateCreated: Sat Apr 27 2024
+                motherName: sample mother name
+                birthDate: '1997-04-26'
+                studentName: Dylan Sprouse test
+                fatherEmailAddress: sample@gmail.com
+                schoolName: philippine elementary school
+                country: sample country
+                city: sample city
+                studentEmail: dylanSprouse@gmail.com
+                imageUrl: >-
+                  https://schoolryde-s3-bucket-us-east-region.s3.amazonaws.com/5386a878-b370-49fc-8a84-5a4730ef78ac.jpeg
+                userId: 727e7f6d-957b-436e-8be4-d4195f9d805e
+                disabilityCondition: Not Required
+                id: 38ef14fd-44ce-4b6b-ab86-a3dc526b94fd
+                fatherPhoneNumber: sample father Phone number
+                isInvited: false
+                age: 27
+                studentDisability: 'yes'
+                fatherName: sample father name
+                grade: 1st
+                imageBase64: ''
+                otherAssistance: sample other assitance
+                motherEmailAddress: sample@gmail.com
+                shareRide: false
+                address: sample address
+                gender: Male
+                note: sample note
+                studentDescription: sample description
+                motherPhoneNumber: sample mother phone number
+                paymentMethod: School Payment System
+                drivers: []
+                studentPhoneNumber: '123456789'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 38ef14fd-44ce-4b6b-ab86-a3dc526b94fd
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /:
+    post:
+      tags:
+        - student
+      summary: add new student
+      description: >-
+        The endpoint makes an HTTP POST request to create a new student entry.
+        The request should include the following parameters in the raw request
+        body: age, city, country, address, gender, studentDescription,
+        studentDisability, grade, schoolName, studentName, otherAssistance,
+        shareRide, paymentMethod, note, birthDate, disabilityCondition,
+        fatherName, fatherPhoneNumber, fatherEmailAddress, motherName,
+        motherPhoneNumber, motherEmailAddress, and imageBase64.
+
+
+        The response of this request can be documented as a JSON schema.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                age: 51
+                city: sample city
+                country: sample country
+                address: sample address
+                gender: Male
+                studentDescription: sample description
+                studentDisability: sample disability
+                grade: sample grade
+                schoolName: sample school name
+                studentName: sample student name
+                otherAssistance: sample other assitance
+                shareRide: sample share ride
+                paymentMethod: sample payment method
+                note: sample note
+                birthDate: same birth date
+                disabilityCondition: sample disability condition
+                fatherName: sample father name
+                fatherPhoneNumber: sample father Phone number
+                fatherEmailAddress: sample faather email address
+                motherName: sample mother name
+                motherPhoneNumber: sample mother phone number
+                motherEmailAddress: sample mother email address
+                imageBase64: image base 64
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - student
+      summary: get all
+      description: |-
+        # Get Students
+
+        This endpoint retrieves a list of students.
+
+        **HTTP Request**
+
+        ``` http
+        GET localhost:3000/students
+
+         ```
+
+        ## Response
+
+        - Status: 200
+        - Body:
+            
+            ``` json
+            {
+                "success": true,
+                "message": "",
+                "data": [
+                    {
+                        "disability": "",
+                        "grade": "",
+                        "imageBase64": "",
+                        "studentName": "",
+                        "schoolName": "",
+                        "address": "",
+                        "country": "",
+                        "city": "",
+                        "imageUrl": "",
+                        "userId": "",
+                        "description": "",
+                        "id": "",
+                        "age": 0
+                    }
+                ]
+            }
+            
+             ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: 727e7f6d-957b-436e-8be4-d4195f9d805e
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /card/user/{id}:
+    get:
+      tags:
+        - payments
+      summary: get cards by customer id
+      description: >-
+        # Get User's Payment Card Details
+
+
+        This endpoint retrieves the payment card details for a specific user.
+
+
+        ## Request
+
+
+        ### Request URL
+
+
+        - `GET` localhost:3000/payment/card/user/:id
+            
+
+        ### Request Parameters
+
+
+        - `id` (path parameter) - The unique identifier of the user.
+            
+
+        ## Response
+
+
+        The response will be a JSON object with the following properties:
+
+
+        - `cardNumber` (string) - The masked card number associated with the
+        user.
+            
+        - `expiryDate` (string) - The expiry date of the card.
+            
+        - `cardType` (string) - The type of the card (e.g. Visa, Mastercard).
+            
+        - `cardHolderName` (string) - The name of the cardholder.
+            
+
+        Example:
+
+
+        ``` json
+
+        {
+            "cardNumber": "**** **** **** 1234",
+            "expiryDate": "12/23",
+            "cardType": "Visa",
+            "cardHolderName": "John Doe"
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: 23c80844-9db9-45e2-993e-4c0919a0ad56
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: cus_PSWGCiiCY8NJdE
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /connectiontoken:
+    get:
+      tags:
+        - payments
+      summary: generate token
+      description: >-
+        ### Get Payment Connection Token
+
+
+        This endpoint is used to retrieve a connection token for payment
+        processing.
+
+
+        #### Request
+
+
+        No request body is required for this request.
+
+
+        - `backendurl`: (string) The base URL of the backend.
+            
+
+        #### Response
+
+
+        The response for this request is a JSON object with the following
+        properties:
+
+
+        - `token`: (string) The connection token for payment processing.
+            
+
+        ``` json
+
+        {
+            "token": "..."
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /create/setup/intent:
+    get:
+      tags:
+        - payments
+      summary: create setup intent
+      description: >-
+        ### Create Payment Setup Intent
+
+
+        This endpoint sends an HTTP GET request to create a payment setup
+        intent.
+
+
+        #### Request
+
+
+        The request does not require a request body. It includes the following
+        parameters in the URL:
+
+
+        - `localbackendurl`: The base URL for the local backend.
+            
+
+        #### Response
+
+
+        The response will be a JSON object representing the payment setup
+        intent. Below is a JSON schema for the response:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "client_secret": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "payment_method_types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "usage": {
+              "type": "string"
+            }
+            // ... (other properties)
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /create/setup/intent/key:
+    get:
+      tags:
+        - payments
+      summary: create setup intents
+      description: >-
+        This endpoint makes an HTTP GET request to retrieve the setup intent key
+        for creating a payment.
+
+
+        ### Request
+
+
+        No request body parameters are required for this request.
+
+
+        ### Response
+
+
+        The response will be a JSON object containing the setup intent key,
+        which can be used to initiate the payment setup process.
+
+
+        #### JSON Schema
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "setupIntentKey": {
+              "type": "string",
+              "description": "The key for the setup intent to be used for payment setup"
+            }
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{id}/createEphemeralKeys:
+    get:
+      tags:
+        - payments
+      summary: create ephemeral keys
+      description: >-
+        ### Create Ephemeral Keys
+
+
+        This endpoint is used to create ephemeral keys for a specific payment
+        ID.
+
+
+        #### Request
+
+
+        - Method: GET
+            
+        - URL: `localhost:3000/payment/:id/createEphemeralKeys`
+            
+
+        #### Response
+
+
+        The response for this request can be described using the following JSON
+        schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "secret": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: cus_PQ65p1MB5ZXJMy
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /sheet/:
+    post:
+      tags:
+        - payments
+      summary: payment sheet
+      description: >-
+        # POST /payment/sheet/
+
+
+        This endpoint is used to submit payment details for a customer.
+
+
+        ## Request Body
+
+
+        - `amount` (number, required): The amount of the payment.
+            
+        - `customerId` (string, required): The unique identifier of the
+        customer.
+            
+
+        ## Response
+
+
+        The response for this request is a JSON object conforming to the
+        following schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "transactionId": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                amount: 100
+                customerId: sample customer id
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /create/customer:
+    post:
+      tags:
+        - payments
+      summary: create customer
+      description: >-
+        ### Create Customer Payment
+
+
+        This endpoint is used to create a new payment for a customer.
+
+
+        #### Request Body Parameters
+
+
+        - `customer_id` (string) - The ID of the customer for whom the payment
+        is being created.
+            
+        - `amount` (number) - The amount of the payment.
+            
+
+        #### Response
+
+
+        Upon successful creation of the payment, the response will include the
+        following:
+
+
+        - `payment_id` (string) - The ID of the newly created payment.
+            
+        - `customer_id` (string) - The ID of the customer for whom the payment
+        was created.
+            
+        - `amount` (number) - The amount of the payment.
+            
+        - `timestamp` (string) - The timestamp of the payment creation.
+            
+
+        If there is an error in creating the payment, the response will include
+        an error message.
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{id}/attach:
+    post:
+      tags:
+        - payments
+      summary: attach payment method
+      description: >-
+        ### POST /payment/:id/attach
+
+
+        This endpoint is used to attach a payment to a specific ID.
+
+
+        #### Request
+
+
+        The request body should be sent in JSON format and include the following
+        parameter:
+
+
+        - `customerId`: The ID of the customer to whom the payment is being
+        attached.
+            
+
+        Example:
+
+
+        ``` json
+
+        {
+            "customerId": "cus_PQ65p1MB5ZXJMy"
+        }
+
+        #### Response
+
+        The response for this request follows the JSON schema below:
+
+        ```json
+
+        {
+            "type": "object",
+            "properties": {
+                // Define the properties of the response here
+            }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                customerId: cus_PQ65p1MB5ZXJMy
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: pm_1OcMXcIGdlw8igcx0sCeImZQ
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /forgot/password:
+    post:
+      tags:
+        - other api's
+      summary: forgot password
+      description: >-
+        The `POST /schools/forgot/password` endpoint is used to initiate the
+        process of resetting a user's forgotten password. The request should
+        include the user's email in the payload.
+
+
+        ### Request Body
+
+
+        - email (string, required): The email address of the user who has
+        forgotten their password.
+            
+
+        ### Response
+
+
+        The response of this request is a JSON object with the following schema:
+
+
+        ``` json
+
+        {
+          "message": "string",
+          "data": {}
+        }
+
+         ```
+
+        - message (string): A message indicating the outcome of the password
+        reset request.
+            
+        - data (object): An empty object is returned in the data field.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: andrian@treelinktechnologies.com
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /verify/forgot/password:
+    post:
+      tags:
+        - other api's
+      summary: verify forgot password
+      description: >-
+        The `POST /schools/verify/forgot/password` endpoint is used to verify
+        and reset a forgotten password for a school user.
+
+
+        ### Request Body
+
+
+        - email (string, required): The email address of the user requesting the
+        password reset.
+            
+        - token (string, required): The verification token received by the user
+        for password reset.
+            
+
+        ### Response
+
+
+        The response of this request is a JSON object with the following schema:
+
+
+        ``` json
+
+        {
+          "status": "string",
+          "message": "string"
+        }
+
+         ```
+
+        - status (string): Indicates the status of the password reset
+        verification.
+            
+        - message (string): Provides additional information about the password
+        reset verification status.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: new password
+                token: sample token
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /update/password:
+    post:
+      tags:
+        - other api's
+      summary: update password
+      description: |-
+        ### Update School Password
+
+        This endpoint is used to update the password for a school.
+
+        **Request Body**
+
+        - password (string, required): The new password for the school.
+            
+
+        **Response**  
+        The response for this request is a JSON schema.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                password: sample password
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /login:
+    post:
+      tags:
+        - other api's
+      summary: login
+      description: |-
+        ### POST /schools/login
+
+        This endpoint is used to log in to the school system.
+
+        #### Request Body
+
+        - email (string, required): The email of the user.
+            
+        - password (string, required): The password of the user.
+            
+
+        #### Response
+
+        The response will be a JSON object with the following schema:
+
+        ``` json
+        {
+          "token": "string",
+          "user_id": "string"
+        }
+
+         ```
+
+        - token (string): The authentication token for the logged-in user.
+            
+        - user_id (string): The unique identifier of the logged-in user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: sample@gmail.com
+                password: sample password
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /contactus:
+    post:
+      tags:
+        - other api's
+      summary: contact us
+      description: >-
+        ### POST /web/contactus
+
+
+        This endpoint is used to submit a contact form with the user's first
+        name, last name, email, phone number, and a message.
+
+
+        #### Request Body
+
+
+        - `firstName` (string, required): The first name of the user.
+            
+        - `lastName` (string, required): The last name of the user.
+            
+        - `email` (string, required): The email address of the user.
+            
+        - `phoneNumber` (string, required): The phone number of the user.
+            
+        - `message` (string, required): The message sent by the user.
+            
+
+        #### Response
+
+
+        The response of this request is a JSON schema. The structure of the
+        response will be defined as per the JSON schema standards.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                firstName: andrian
+                lastName: andrian
+                email: andrian@treelinktechnologies.com
+                phoneNumber: '+6390648080'
+                message: sample message
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /faq:
+    post:
+      tags:
+        - other api's
+      summary: save faq
+      description: >-
+        ### POST /web/faq
+
+
+        This endpoint is used to submit a question to the FAQ section.
+
+
+        #### Request Body
+
+
+        - question (string, required): The question to be submitted to the FAQ.
+            
+
+        #### Response
+
+
+        The response of this request is a JSON object following the schema
+        below:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                question: sample question
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+            
+  /service-areas:
+    get:
+      tags:
+        - Service Areas
+      summary: Get all service areas
+      description: Retrieves a list of all service areas
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceArea'
+        '500':
+          description: Server error
+          
+    post:
+      tags:
+        - Service Areas
+      summary: Add new service area
+      description: Creates a new service area
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                zipCodes:
+                  type: array
+                  items:
+                    type: number
+                  description: Array of zip codes for the service area
+              required:
+                - zipCode
+              example:
+                zipCode: [50179, 50178]
+      responses:
+        '201':
+          description: Service area created successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+
+  /service-areas/{id}:
+    get:
+      tags:
+        - Service Areas
+      summary: Get service area by ID
+      description: Retrieves a specific service area by its ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the service area
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceArea'
+        '404':
+          description: Service area not found
+        '500':
+          description: Server error
+          
+    put:
+      tags:
+        - Service Areas
+      summary: Update service area
+      description: Updates an existing service area
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the service area to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceAreaInput'
+      responses:
+        '200':
+          description: Service area updated successfully
+        '400':
+          description: Invalid input
+        '404':
+          description: Service area not found
+        '500':
+          description: Server error
+          
+    delete:
+      tags:
+        - Service Areas
+      summary: Delete service area
+      description: Deletes a specific service area
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the service area to delete
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Service area deleted successfully
+        '404':
+          description: Service area not found
+        '500':
+          description: Server error
+
+components:
+  schemas:
+    ServiceArea:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the service area
+        zipCodes:
+          type: array
+          items:
+            type: number
+          description: Array of zip codes in this service area
+        createdAt:
+          type: string
+          format: date-time
+          description: When the service area was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the service area was last updated
+      required:
+        - id
+        - zipCodes
+    
+    ServiceAreaInput:
+      type: object
+      properties:
+        zipCodes:
+          type: array
+          items:
+            type: number
+          description: Array of zip codes for the service area
+      required:
+        - zipCodes

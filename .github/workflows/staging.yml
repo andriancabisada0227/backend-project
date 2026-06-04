@@ -1,0 +1,53 @@
+name: Dev Deploy
+on:
+  push:
+    branches:
+      - staging
+
+env:
+  applicationfolder: core
+  AWS_REGION: us-west-1
+  S3BUCKET: schoolryde-staging
+
+
+jobs:
+  build:
+    name: Build and Package
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout Repository
+
+      - uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.IAMROLE_GITHUB_STAGING }}
+          role-session-name: GitHub-Action-Role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - run: npm install
+      - run: npm run dev           
+      - run: tar --ignore-failed-read -czf /tmp/core.tar.gz .   
+      - name: Upload Artifact to s3
+        run: aws s3 cp /tmp/core.tar.gz s3://${{ env.S3BUCKET }}/      
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: Prod
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+    - uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: ${{ secrets.IAMROLE_GITHUB_STAGING }}
+        role-session-name: GitHub-Action-Role
+        aws-region: ${{ env.AWS_REGION }}
+    - run: |
+        echo "Deploying branch ${{ env.GITHUB_REF }} to ${{ github.event.inputs.environment }}"
+        commit_hash=`git rev-parse HEAD`
+        aws deploy create-deployment --application-name staging --deployment-group-name staging --github-location repository=$GITHUB_REPOSITORY,commitId=$commit_hash --ignore-application-stop-failures
+ 

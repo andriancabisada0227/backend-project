@@ -1,0 +1,3534 @@
+openapi: 3.0.0
+info:
+  title: schoolryde - parents
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/refreshtoken
+  - url: http://localhost:3000/parents
+  - url: http://localhost:3000/parent
+  - url: http://localhost:3000/students
+  - url: http://localhost:3000/termsandconditions
+  - url: http://localhost:3000/privacy-policy
+  - url: http://localhost:3000/ccpa
+  - url: http://localhost:3000/copyright
+  - url: http://localhost:3000/driver
+  - url: http://localhost:3000/drivers
+  - url: http://localhost:3000/support
+  - url: http://localhost:3000/email
+  - url: http://localhost:3000/sendotp
+  - url: http://localhost:3000/verifyotp
+  - url: http://localhost:3000/oauth
+  - url: http://localhost:3000/changepassword
+  - url: http://localhost:3000/request
+  - url: http://localhost:3000/updateemailorphone
+  - url: http://localhost:3000/forgotpassword
+  - url: http://localhost:3000/logout
+  - url: http://localhost:3000/schedule
+  - url: http://localhost:3000/booking
+  - url: http://localhost:3000/ooking
+  - url: http://localhost:3000/payment
+  - url: http://localhost:3000/ride
+  - url: http://localhost:3000/registerforpushnotifications
+  - url: http://localhost:3000/unregisterforpushnotifications
+  - url: http://localhost:3000/chat
+  - url: http://localhost:3000/send-message
+  - url: http://localhost:3000/sendhelpandsupport
+  - url: http://localhost:3000/white
+  - url: http://localhost:3000/ridecost
+tags:
+  - name: token
+  - name: parents api
+  - name: student api
+  - name: terms and conditions api
+  - name: privacy policy
+  - name: ccpa
+  - name: copyright
+  - name: driver api
+  - name: email - otp - oauth
+  - name: schedule
+  - name: bookRide
+  - name: payments
+  - name: routes
+  - name: push notif api
+  - name: chat
+  - name: help and support
+  - name: whiteList
+  - name: ride cost
+paths:
+  /andre09090@gmail.com:
+    get:
+      tags:
+        - token
+      summary: refresh token
+      description: >-
+        ### Refresh Token for User
+
+
+        This endpoint sends an HTTP GET request to
+        `localhost:3000/refreshtoken/andre09090@gmail.com` to refresh the token
+        for the specified user.
+
+
+        #### Request Body
+
+
+        This request does not contain a request body.
+
+
+        #### Response Body
+
+
+        The response of this request is a JSON object with the following
+        properties:
+
+
+        - `access_token` (string)
+            
+        - `token_type` (string)
+            
+        - `expires_in` (integer)
+            
+        - `refresh_token` (string)
+            
+        - `scope` (string)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{userId}:
+    get:
+      tags:
+        - parents api
+      summary: get parent by userId
+      description: >-
+        This endpoint retrieves the details of a specific parent identified by
+        the userId. The response of this request can be documented as a JSON
+        schema to provide a clear structure of the data that will be returned.
+
+
+        The JSON schema for the response will outline the properties and their
+        data types, providing a clear understanding of the structure of the
+        response data.
+      parameters:
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: c617a4ef-a908-4269-9bc5-fe864f2b74e9
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: userId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: c617a4ef-a908-4269-9bc5-fe864f2b74e9
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{parentName}:
+    get:
+      tags:
+        - parents api
+      summary: get parent by name
+      description: >-
+        This endpoint retrieves the details of a specific parent identified by
+        the parentName parameter. The response of this request is a JSON schema
+        describing the structure of the parent's details.
+      parameters:
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: parentName
+          in: path
+          schema:
+            type: string
+          required: true
+          example: John Doe222
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /driver/latest:
+    get:
+      tags:
+        - parents api
+      summary: get parent driver
+      description: |-
+        # Get Latest Driver for Parents
+
+        This endpoint retrieves the latest driver details for parents.
+
+        ## Request
+
+        - Method: GET
+            
+        - URL: `localhost:3000/parents/driver/latest`
+            
+
+        ## Response
+
+        The response will include the following details:
+
+        - `driverId`: The unique identifier of the driver.
+            
+        - `name`: The name of the driver.
+            
+        - `licenseNumber`: The license number of the driver.
+            
+        - `vehicleNumber`: The vehicle number associated with the driver.
+            
+        - `status`: The current status of the driver.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: 44218e77-7a57-4fec-8404-5d37795959af
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /:
+    post:
+      tags:
+        - ride cost
+      summary: ride cost
+      description: >-
+        The `POST /ridecost` endpoint calculates the ride cost for the given
+        students based on their distances traveled. The request should include
+        an array of objects, where each object contains the `studentId` and
+        `distance` properties.
+
+
+        ### Request Body
+
+
+        - `students` (array of objects)
+            
+            - `studentId` (string): The unique identifier of the student.
+                
+            - `distance` (number): The distance traveled by the student.
+                
+
+        ### Response
+
+
+        The response will be a JSON object with the following properties:
+
+
+        - `success` (boolean): Indicates if the request was successful.
+            
+        - `data` (array of objects): Contains the details of the students with
+        the calculated ride cost.
+            
+            - `studentId` (string): The unique identifier of the student.
+                
+            - `studentName` (string): The name of the student.
+                
+            - `imageUrl` (string): The URL of the student's image.
+                
+            - `cost` (number): The calculated cost of the ride for the student.
+                
+
+        #### JSON Schema
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "studentId": {
+                    "type": "string"
+                  },
+                  "studentName": {
+                    "type": "string"
+                  },
+                  "imageUrl": {
+                    "type": "string"
+                  },
+                  "cost": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                success: true
+                data:
+                  - studentId: f72f01bd-2d6c-4145-9d8d-4bb03a36ba2a
+                    studentName: sample student Name
+                    imageUrl: sample image url
+                    cost: 20
+                  - studentId: f72f01bd-2d6c-4145-9d8d-4bb03a36ba2a
+                    studentName: sample student Name 1
+                    imageUrl: sample image url
+                    distance: 15
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - driver api
+      summary: search filters
+      description: >-
+        ### GET /drivers
+
+
+        This HTTP GET request is used to search for drivers based on specified
+        filters. The request should be made to the `localhost:3000//drivers`
+        endpoint.
+
+
+        #### Request Parameters
+
+
+        - `gender` (string): The gender of the driver being searched for
+            
+        - `vehicleType` (string): The type of vehicle being searched for
+            
+        - `ageLimit_low` (number): The lower age limit for the drivers
+            
+        - `ageLimit_high` (number): The upper age limit for the drivers
+            
+        - `radius` (number): The radius within which to search for drivers
+            
+        - `page` (number): The page number for pagination
+            
+        - `latitude` (number): The latitude coordinate for the search
+            
+        - `longitude` (number): The longitude coordinate for the search
+            
+        - `pagesize` (number): The number of results per page
+            
+
+        #### Response
+
+
+        The response to this request will have a status code of 500, and will
+        include a JSON object with the following properties:
+
+
+        ``` json
+
+        {
+          "success": "boolean",
+          "error": "string"
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: c7e76677-7b7f-49da-b454-c374cef9a022
+        - name: gender
+          in: query
+          schema:
+            type: string
+          example: Female
+        - name: vehicleType
+          in: query
+          schema:
+            type: string
+          example: Van
+        - name: ageLimit_low
+          in: query
+          schema:
+            type: integer
+          example: '20'
+        - name: ageLimit_high
+          in: query
+          schema:
+            type: integer
+          example: '40'
+        - name: radius
+          in: query
+          schema:
+            type: integer
+          example: '4'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: latitude
+          in: query
+          schema:
+            type: number
+          example: '37.33285340665878'
+        - name: longitude
+          in: query
+          schema:
+            type: number
+          example: '-121.87834138055486'
+        - name: pagesize
+          in: query
+          schema:
+            type: integer
+          example: '100'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{id}:
+    delete:
+      tags:
+        - bookRide
+      summary: delete
+      description: >-
+        # Delete Booking
+
+
+        This endpoint is used to delete a specific booking by providing the
+        booking ID in the URL.
+
+
+        ## Request
+
+
+        - Method: DELETE
+            
+        - URL: localhost:3000/ooking/:id
+            
+
+        ### Path Parameters
+
+
+        - `id` (string, required): The ID of the booking to be deleted.
+            
+
+        ## Response
+
+
+        The response will not contain a message body. A successful deletion will
+        return a status code 200, indicating that the booking has been
+        successfully deleted. If the provided booking ID does not exist, the
+        response will return a status code 404.
+      parameters:
+        - name: UserId
+          in: header
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - bookRide
+      summary: get
+      description: >-
+        # Get Booking Details
+
+
+        This endpoint retrieves the details of a specific booking identified by
+        the provided ID.
+
+
+        ## Request
+
+
+        - Method: GET
+            
+        - URL: `localhost:3000/booking/:id`
+            
+
+        ## Response
+
+
+        The response for this request is a JSON object with the following
+        schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            // Include the properties of the response object here
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: add7296c-53df-43a8-a980-2ee055ba20c7
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - bookRide
+      summary: edit
+      description: >-
+        This endpoint allows the user to update a specific booking by sending an
+        HTTP PUT request to the provided URL with the booking ID in the path
+        parameter.
+
+
+        ### Request Parameters
+
+
+        - No specific request parameters are mentioned.
+            
+
+        ### Response
+
+
+        The response of this request is provided as a JSON schema, detailing the
+        structure of the data that will be returned upon a successful update of
+        the booking. The JSON schema will outline the properties and their types
+        that can be expected in the response.
+
+
+        Example JSON Schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "bookingId": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+
+         ```
+      requestBody:
+        content: {}
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /edit:
+    put:
+      tags:
+        - parents api
+      summary: edit parent
+      description: >-
+        This endpoint allows you to update the details of a parent. The HTTP PUT
+        request should be made to localhost:3000/parent/edit with the following
+        request body in raw format:
+
+
+        ``` json
+
+        {
+          "parentName": "string",
+          "address": "string",
+          "city": "string",
+          "country": "string",
+          "emergencyPersonName": "string",
+          "emergencyPhoneNumber": "string"
+        }
+
+         ```
+
+        The request body should include the updated parent's name, address,
+        city, country, emergency contact person's name, and emergency contact
+        phone number.
+
+
+        The response to this request will provide the updated details of the
+        parent after the edit operation.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                parentName: Jackson Kai
+                address: Home
+                city: California
+                country: USA
+                emergencyPersonName: Miller
+                emergencyPhoneNumber: '5223514221'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: 6fc6c091-7ff7-4657-bc04-9b27e7bf5237
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /location/add:
+    post:
+      tags:
+        - driver api
+      summary: add driver location
+      description: |-
+        ### Add Driver Location
+
+        This endpoint is used to add the location of a driver.
+
+        #### Request Body
+
+        - `location` (object)
+            
+            - `country` (string)
+                
+            - `city` (string)
+                
+            - `state` (string)
+                
+            - `latitude` (number)
+                
+            - `longitude` (number)
+                
+
+        Example:
+
+        ``` json
+        {
+          "location": {
+            "country": "United States",
+            "city": "San Ramon",
+            "state": "CA",
+            "latitude": 37.781555,
+            "longitude": -121.93707
+          }
+        }
+
+         ```
+
+        #### Response
+
+        The response for this request is a JSON schema.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                location:
+                  country: United States
+                  city: San Ramon
+                  state: CA
+                  latitude: 37.781555
+                  longitude: -121.93707
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: 5801120d-fe45-422d-864f-19820c1a0549
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /image:
+    post:
+      tags:
+        - parents api
+      summary: parent upload image
+      description: >-
+        ### Parent Image Upload
+
+
+        This endpoint allows the user to upload an image as a base64 string to
+        the parent directory.
+
+
+        #### Request Body
+
+
+        - `imageBase64` (string, required): The base64 encoded string of the
+        image to be uploaded.
+            
+
+        #### Response
+
+
+        The response will be in JSON format and will follow the schema below:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                imageBase64: image base 64
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /all/confirmed:
+    get:
+      tags:
+        - student api
+      summary: get confirm students
+      description: >-
+        ### Get Confirmed Students
+
+
+        This endpoint makes an HTTP GET request to retrieve all confirmed
+        students.
+
+
+        #### Request Body
+
+
+        This request does not require a request body.
+
+
+        #### Response Body
+
+
+        - `students`: An array of objects containing information about confirmed
+        students, including their names, IDs, and other details.
+            
+
+        Example response body:
+
+
+        ``` json
+
+        {
+            "students": [
+                {
+                    "id": "123",
+                    "name": "John Doe",
+                    "email": "john.doe@example.com",
+                    ...
+                },
+                {
+                    "id": "456",
+                    "name": "Jane Smith",
+                    "email": "jane.smith@example.com",
+                    ...
+                },
+                ...
+            ]
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: 44218e77-7a57-4fec-8404-5d37795959af
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{studentName}:
+    get:
+      tags:
+        - student api
+      summary: get student by name
+      description: |-
+        ### Get Student Details
+
+        This endpoint retrieves the details of a specific student by their name.
+
+        #### Request
+
+        - Method: GET
+            
+        - URL: `localhost:3000/students/:studentName`
+            
+        - Path Parameters:
+            
+            - `studentName`: The name of the student for whom the details are to be retrieved.
+                
+
+        #### Response
+
+        The response will be a JSON object with the following schema:
+
+        ``` json
+        {
+          "type": "object",
+          "properties": {
+            // Add properties based on the actual response
+          }
+        }
+
+         ```
+      parameters:
+        - name: studentName
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /latest:
+    get:
+      tags:
+        - terms and conditions api
+      summary: get latest
+      description: >-
+        This endpoint makes an HTTP GET request to retrieve the latest terms and
+        conditions from the backend server.
+
+
+        ### Response
+
+
+        The response of this request is a JSON schema representing the latest
+        terms and conditions.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /vn=3:
+    get:
+      tags:
+        - copyright
+      summary: get specific
+      description: >-
+        This endpoint makes an HTTP GET request to retrieve the copyright
+        information for a specific version number. The response of this request
+        is documented below as a JSON schema.
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string"
+            },
+            "copyrightHolder": {
+              "type": "string"
+            },
+            "validUntil": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+
+         ```
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get/all:
+    get:
+      tags:
+        - copyright
+      summary: get all
+      description: |-
+        This endpoint retrieves all the copyright information from the backend.
+
+        The response of this request can be documented as a JSON schema:
+
+        ``` json
+        {
+          "type": "object",
+          "properties": {
+            "copyrights": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "year": {
+                    "type": "integer"
+                  }
+                  // Add more properties as per the actual response
+                }
+              }
+            }
+          }
+        }
+
+         ```
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get/latest:
+    get:
+      tags:
+        - copyright
+      summary: get latest
+      description: >-
+        ### Get Latest Copyright Information
+
+
+        This endpoint is used to retrieve the latest copyright information.
+
+
+        #### Request
+
+
+        - No request body is required for this request.
+            
+
+        #### Response
+
+
+        The response will be a JSON object containing the latest copyright
+        information. Below is a JSON schema representing the structure of the
+        response:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "copyrightTitle": {
+              "type": "string"
+            },
+            "copyrightYear": {
+              "type": "integer"
+            },
+            "copyrightHolder": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /add:
+    post:
+      tags:
+        - copyright
+      summary: add copyright
+      description: >-
+        ### Add Copyright
+
+
+        This endpoint allows users to add a copyright by uploading a file in
+        base64 format.
+
+
+        #### Request
+
+
+        The request should be made to the following URL:
+
+
+        ```
+
+        POST {{productionurl}}copyright/add
+
+         ```
+
+        The request body should be of type raw, and should contain a JSON object
+        with the following key:
+
+
+        - `fileBase64`: The base64 encoded file to be added as a copyright.
+            
+
+        #### Response
+
+
+        The response for this request is a JSON object conforming to the
+        following schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+
+        The `success` property indicates whether the operation was successful,
+        and the `message` property provides additional information about the
+        result of the operation.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                fileBase64: file base 64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /reviews/{id}:
+    get:
+      tags:
+        - driver api
+      summary: get driver review
+      description: >-
+        This endpoint retrieves the reviews for a specific driver identified by
+        the provided ID.
+
+
+        ### Response
+
+
+        The response of this request is a JSON object conforming to the
+        following schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "driverId": {
+              "type": "string"
+            },
+            "rating": {
+              "type": "number"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /students/7f87c2f4-edc3-4fd5-8f5e-4aab71c51ef6:
+    get:
+      tags:
+        - driver api
+      summary: get driver student
+      description: >-
+        This endpoint retrieves the details of a specific student driver with
+        the provided ID. The response of this request is a JSON schema
+        representing the structure of the student driver's details.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /new:
+    post:
+      tags:
+        - driver api
+      summary: add driver
+      description: >-
+        ### POST /driver/new
+
+
+        This endpoint is used to create a new driver profile.
+
+
+        #### Request Body
+
+
+        - `driverName` (string): The name of the driver.
+            
+        - `age` (number): The age of the driver.
+            
+        - `address` (string): The address of the driver.
+            
+        - `description` (string): Additional description or information about
+        the driver.
+            
+        - `vehicleName` (string): The name of the vehicle.
+            
+        - `vehicleType` (string): The type of vehicle.
+            
+        - `plateNumber` (string): The plate number of the vehicle.
+            
+        - `experience` (number): The years of driving experience.
+            
+        - `gender` (string): The gender of the driver.
+            
+        - `licenseNumber` (string): The license number of the driver.
+            
+        - `insuranceId` (string): The insurance ID of the driver.
+            
+        - `approvedStatus` (string): The approval status of the driver.
+            
+        - `imageBase64` (string): Base64 encoded image of the driver.
+            
+
+        #### Response (JSON Schema)
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "driverId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                driverName: Katie Sims
+                age: 34
+                address: sample address
+                description: >-
+                  Lorem Ipsum is simply dummy text of the printing and
+                  typesetting industry.
+                vehicleName: White Sedan
+                vehicleType: Sedan
+                plateNumber: HP39A2975
+                experience: 5
+                gender: Female
+                licenseNumber: sample license number
+                insuranceId: sample insurance id
+                approvedStatus: new
+                imageBase64: >-
+                  iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADMElEQVR4nOzVwQnAIBQFQYXff81RUkQCOyDj1YOPnbXWPmeTRef+/3O/OyBjzh3CD95BfqICMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMO0TAAD//2Anhf4QtqobAAAAAElFTkSuQmCC
+      parameters:
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{id}/review:
+    post:
+      tags:
+        - driver api
+      summary: add driver review
+      description: >-
+        ### POST /driver/:id/review
+
+
+        This endpoint is used to submit a review for a specific driver
+        identified by the provided ID.
+
+
+        #### Request
+
+
+        - Method: POST
+            
+        - URL: {{localbackendurl}}driver/:id/review
+            
+        - Body:
+            
+            - review (object)
+                
+                - userId (string): The ID of the user submitting the review.
+                    
+                - content (string): The content of the review.
+                    
+                - rating (number): The rating given to the driver.
+                    
+
+        #### Response
+
+
+        The response for this request is a JSON object with the following
+        schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+
+        The response contains the status and a message indicating the outcome of
+        the review submission.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                review:
+                  userId: 564afb63-0ac8-498a-baa2-2e66f435beec
+                  content: >-
+                    Thank you for taking me home safely late at night. And it
+                    was really fun while I went there see you.
+                  rating: 4
+      parameters:
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: '{{driverId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{id}/student:
+    post:
+      tags:
+        - driver api
+      summary: add driver student
+      description: >-
+        The endpoint allows for creating a new student under a specific driver.
+        The request should be a POST to the URL
+        `localhost:3000/driver/:id/student` with the following payload in the raw
+        request body:
+
+
+        ``` json
+
+        {
+          "student": {
+            "studentId": "string",
+            "schoolName": "string",
+            "graded": "string",
+            "age": 10,
+            "userId": "string"
+          }
+        }
+
+         ```
+
+        The response of this request can be documented as a JSON schema.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                student:
+                  studentId: cceeba08-d164-48c4-bfd9-97061bb9ca47
+                  schoolName: Sent Peter School
+                  graded: 4th Grade
+                  age: 10
+                  userId: 564afb63-0ac8-498a-baa2-2e66f435beec
+      parameters:
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 7f87c2f4-edc3-4fd5-8f5e-4aab71c51ef6
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{driverid}/reviews/{reviewid}:
+    put:
+      tags:
+        - driver api
+      summary: edit driver reviews
+      description: >-
+        This endpoint allows you to update a specific review for a driver. The
+        HTTP PUT request should be made to
+        {{localbackendurl}}driver/:driverid/reviews/:reviewid, with the request
+        body containing the updated review details. The request body should
+        include the following parameters:
+
+
+        - "name": (string) The updated name of the review.
+            
+        - "content": (string) The updated content of the review.
+            
+        - "rating": (number) The updated rating for the review.
+            
+        - "datePosted": (string) The updated date of posting the review in the
+        format "MM-DDYYYY".
+            
+
+        The response will include the updated details of the review after the
+        successful update.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: sample content edit
+                content: sample content edit
+                rating: 3
+                datePosted: 12-0202023
+      parameters:
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: 2193497d-993e-4dcb-8662-86fc152fd5ce
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlMDkwOTBAZ21haWwuY29tIiwiaWF0IjoxNzAxNDc3NDU2LCJleHAiOjE3MDE1MDYyNTZ9.hA_Xm_aEil5RBObgolYLTvO0eeRtRQE7_bArQQ5MeNs
+        - name: driverid
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 89239570-c865-45a1-87a7-106aa9bed703
+        - name: reviewid
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 02a871c2-9e9d-4bb0-9634-2bce8799927f
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - driver api
+      summary: delete driver review by id
+      description: >-
+        ### Delete Driver Review
+
+
+        This endpoint is used to delete a specific review for a driver.
+
+
+        #### Request Parameters
+
+
+        - `driverid` (path) : The ID of the driver for whom the review needs to
+        be deleted.
+
+        - `reviewid` (path) : The ID of the review to be deleted.
+            
+
+        #### Response
+
+
+        - Status: 200
+
+        - `success` (boolean) : Indicates if the deletion was successful.
+
+        - `message` (string) : A message related to the deletion process.
+
+        - `data` (object) : The metadata and attributes related to the driver's
+        details, including reviews, students, vehicle information, ratings, and
+        other relevant data.
+            
+
+        The response includes the metadata with HTTP status code, request ID,
+        attempts, and total retry delay. The attributes contain details such as
+        image base64, reviews, name, students, vehicle name, image URL, ratings,
+        user ID, total students, plate number, description, and age.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: driverid
+          in: path
+          schema:
+            type: string
+          required: true
+          example: c9f4b421-55bc-4612-a260-6bbe20a05354
+        - name: reviewid
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 7498869f-9523-450c-9b8d-cba937b94710
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /8f2a6e4d-11f2-47bb-bf38-a694b151987a:
+    put:
+      tags:
+        - driver api
+      summary: edit driver details
+      description: >-
+        ### Update Driver Details
+
+
+        This endpoint allows the client to update the details of a specific
+        driver.
+
+
+        #### Request Body
+
+
+        - acceptDisabled (boolean): Indicates whether the driver accepts
+        disabled passengers.
+            
+        - address (string): The address of the driver.
+            
+        - approvedStatus (string): The approval status of the driver.
+            
+        - city (string): The city where the driver is located.
+            
+        - country (string): The country where the driver is located.
+            
+        - description (string): A description of the driver.
+            
+        - maxPassenger (string): The maximum number of passengers the driver can
+        accommodate.
+            
+        - driverName (string): The name of the driver.
+            
+        - plateNumber (string): The vehicle's plate number.
+            
+        - role (string): The role of the driver.
+            
+        - vehicleName (string): The name of the driver's vehicle.
+            
+        - vehicleYear (string): The year of the driver's vehicle.
+            
+        - age (integer): The age of the driver.
+            
+
+        #### Response
+
+
+        The response of this request is a JSON schema representing the updated
+        details of the driver.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                acceptDisabled: true
+                address: Cilame
+                approvedStatus: ''
+                city: Bandung
+                country: Indonesia
+                description: adsfas
+                maxPassenger: '3'
+                driverName: Herlangga 48 update
+                plateNumber: D1234
+                role: Caregiver
+                vehicleName: Sedasn
+                vehicleYear: '2002'
+                age: 22
+      parameters:
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: 8f2a6e4d-11f2-47bb-bf38-a694b151987a
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{driverid}/students/{studentid}:
+    delete:
+      tags:
+        - driver api
+      summary: delete driver student by id
+      description: >-
+        This HTTP DELETE request is used to remove a specific student associated
+        with a driver. The `:driverid` and `:studentid` parameters in the URL
+        specify the driver and the student to be removed, respectively.
+
+
+        The request does not contain a request body, and the response returns a
+        status code of 200. The response body includes a `success` boolean
+        field, a `message` string field, and a `data` object containing various
+        attributes related to the driver and the removed student.
+
+
+        The `data` object includes attributes such as `imageBase64`, `reviews`,
+        `name`, `students`, `vehicleName`, `imageUrl`, `ratings`, `userId`,
+        `totalStudents`, `plateNumber`, `description`, `id`, and `age`.
+
+
+        The `success` field indicates whether the deletion was successful, and
+        the `message` field may contain additional information about the
+        deletion process.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: driverid
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 7f87c2f4-edc3-4fd5-8f5e-4aab71c51ef6
+        - name: studentid
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12312312'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - routes
+      summary: driver ride status
+      description: >-
+        ### POST /driver/:driverid/students/:studentid
+
+
+        This endpoint is used to update the ride status and schedule ID for a
+        specific student associated with a driver.
+
+
+        #### Request Body
+
+
+        - `rideStatus` (string): The status of the ride, which can be one of the
+        following values:
+            
+            - PICKING_UP_HOME
+                
+            - PICKED_UP_HOME
+                
+            - DROPPED_OFF_SCHOOL
+                
+            - PICKING_UP_SCHOOL
+                
+            - PICKED_UP_SCHOOL
+                
+            - DROPPED_OFF_HOME
+                
+        - `scheduleID` (string): The unique identifier of the schedule.
+            
+
+        #### Response
+
+
+        The response of this request is a JSON object with the following schema:
+
+
+        ``` json
+
+        {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+
+         ```
+
+        - `status` (string): The status of the response.
+            
+        - `message` (string): A message providing information about the response
+        status.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                rideStatus: PICKING_UP_HOME
+                scheduleID: sample schedule id
+      parameters:
+        - name: driverid
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: studentid
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /change:
+    post:
+      tags:
+        - driver api
+      summary: change driver
+      description: >-
+        ### Change Driver Details
+
+
+        This endpoint is used to change the details of a driver.
+
+
+        #### Request
+
+
+        - Method: POST
+            
+        - URL: `localhost:3000/driver/change`
+            
+        - Body:
+            
+            - `driverId` (string, required): The unique identifier of the driver.
+                
+
+        #### Response
+
+
+        The response for this request is a JSON object conforming to the
+        following schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            // Define the properties of the response JSON schema here
+          }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                driverId: sample driver id
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /ratings/compute/{id}:
+    post:
+      tags:
+        - driver api
+      summary: recompute driver ratings - driver id
+      description: >-
+        ### Compute Driver Ratings
+
+
+        This endpoint allows you to compute the ratings of a driver based on the
+        provided driver ID.
+
+
+        #### Request Body
+
+
+        - id (string, required): The ID of the driver for which ratings are to
+        be computed.
+            
+
+        #### Response Body
+
+
+        The response is a JSON object conforming to the following schema:
+
+
+        ``` json
+
+        {
+            "driverId": "string",
+            "averageRating": "number",
+            "totalRatings": "number"
+        }
+
+         ```
+
+        - driverId (string): The ID of the driver for which the ratings are
+        computed.
+            
+        - averageRating (number): The average rating of the driver.
+            
+        - totalRatings (number): The total number of ratings received by the
+        driver.
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 04a13b39-5b1e-4bbf-805b-341273a1656b
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /search/drivers/no-parents-assigned:
+    get:
+      tags:
+        - driver api
+      summary: search drivers no parent assigned
+      description: >-
+        This API endpoint makes an HTTP GET request to search for drivers who
+        have no parents assigned. The request includes query parameters for page
+        number, page size, latitude, longitude, and radius. The `Authorization`
+        header is included for authentication.
+
+
+        The response body for this request is a JSON object containing the
+        search results for drivers with no parents assigned.
+      parameters:
+        - name: Accept
+          in: header
+          schema:
+            type: string
+          example: application/json, text/plain, */*
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
+          example: en-US,en;q=0.9
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRpYW5hQHRyZWVsaW5rdGVjaG5vbG9naWVzLmNvbSIsImlhdCI6MTcyMzc3MjA0MSwiZXhwIjoxNzIzODAwODQxfQ.ZoCoiCohq-IFtQWztCquPzq_sQfzFVuQvM9DdHN3-9c
+        - name: Connection
+          in: header
+          schema:
+            type: string
+          example: keep-alive
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: http://localhost:3000
+        - name: Referer
+          in: header
+          schema:
+            type: string
+          example: http://localhost:3000/
+        - name: User-Agent
+          in: header
+          schema:
+            type: string
+          example: >-
+            Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
+            (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+          example: '10'
+        - name: latitude
+          in: query
+          schema:
+            type: number
+          example: '-6.330890022512592'
+        - name: longitude
+          in: query
+          schema:
+            type: number
+          example: '106.80638938151938'
+        - name: radius
+          in: query
+          schema:
+            type: integer
+          example: '10'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /Register/resendCode:
+    post:
+      tags:
+        - email - otp - oauth
+      summary: email sign up - resend code
+      description: >
+
+        This endpoint is used to resend the verification code for email
+        registration. When making a POST request to
+        localhost:3000/email/Register/resendCode, the request should include the
+        email, phoneNumber, and password in the raw request body.
+
+
+        ### Request Body
+
+        - email (string): The email address for which the verification code
+        needs to be resent.
+
+        - phoneNumber (string): The phone number associated with the email
+        address.
+
+        - password (string): The password for the email account.
+
+
+        ### Response
+
+        Upon successful execution, the endpoint returns a status code of 201 and
+        a JSON object with the following properties:
+
+        - success (boolean): Indicates whether the operation was successful.
+
+        - message (string): Any additional information or error message.
+
+        - isVerified (boolean): Indicates whether the email address is verified.
+
+
+        Example:
+
+        ```json
+
+        {
+            "success": true,
+            "message": "",
+            "isVerified": true
+        }
+
+        ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: andrebulaho@gmail.com
+                phoneNumber: '+62812345678912101'
+                password: qwe123ASD!@#
+                role: PARENT
+                TaxiCode: sample taxi code
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /Verification:
+    post:
+      tags:
+        - email - otp - oauth
+      summary: email verification
+      description: >2+
+
+            
+        ## Email Verification
+
+
+        This endpoint is used to verify an email address.
+
+
+        ### Request Body
+
+        - `email` (string, required): The email address to be verified.
+
+        - `token` (number, required): The verification token.
+
+
+        ### Response
+
+        - `message` (string): A message indicating the result of the
+        verification process.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: ari@treelinktechnologies.com
+                token: 3290
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /SignIn:
+    post:
+      tags:
+        - email - otp - oauth
+      summary: email sign in
+      description: >
+
+        This endpoint is used to sign in with an email or phone number. The
+        request should be sent as an HTTP POST to localhost:3000/email/SignIn
+        with a JSON payload in the raw request body. The payload should include
+        the "email" or "phoneNumber" and "password" for authentication.
+
+
+        ### Request Body
+
+        - `email` (string): The email of the user.
+
+        - `phoneNumber` (string): The phone number of the user.
+
+        - `password` (string): The password for authentication.
+
+
+        ### Response
+
+        The endpoint returns a status code of 400 for unsuccessful sign-in
+        attempts. The response body includes a "success" boolean indicating the
+        success status, and an "error" message if applicable.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: ari@treelinktechnologies.com
+                password: qwe123ASD!@#
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: string
+          description: PARENT/DRIVER
+          example: PARENT
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /update/emailorphoneNumber:
+    post:
+      tags:
+        - email - otp - oauth
+      summary: send code to update email or phone
+      description: >
+
+        This endpoint is used to update the email or phone number associated
+        with a user account. The request should be sent as an HTTP POST to
+        {{localbackendurl}}request/update/emailorphoneNumber with a payload in
+        the raw request body type. The payload should include the key "toUpdate"
+        with the value "phone" or "email" to specify which information needs to
+        be updated.
+
+
+        ### Request Body
+
+        - toUpdate (string): Specifies whether the email or phone number should
+        be updated.
+
+
+        ### Response
+
+        The endpoint returns a JSON response with a status code of 200. The
+        response body includes the following fields:
+
+        - success (boolean): Indicates whether the update was successful.
+
+        - message (string): Provides any additional information or error
+        messages related to the update.
+
+
+        Example:
+
+        ```json
+
+        {
+            "success": true,
+            "message": ""
+        }
+
+        ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: sample email
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /update/password:
+    post:
+      tags:
+        - email - otp - oauth
+      summary: update password
+      description: >-
+        ### Update Email Password
+
+
+        This endpoint allows the user to update their email password.
+
+
+        #### Request Body
+
+
+        - email (string, required): The email address for which the password
+        needs to be updated.
+            
+        - password (string, required): The new password for the email account.
+            
+
+        #### Response
+
+
+        The response for this request is a JSON object with the following
+        properties:
+
+
+        - status (string): The status of the request, indicating success or
+        failure.
+            
+        - message (string): A message providing additional information about the
+        status.
+            
+
+        Here is a sample response schema:
+
+
+        ``` json
+
+        {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: shannonlee+1234@gmail.com
+                password: Password123!!
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /userid/limit:
+    get:
+      tags:
+        - schedule
+      summary: get  all schedule by user id
+      description: >-
+        # Schedule by User ID and Limit
+
+
+        This endpoint retrieves the schedule for a specific user within a
+        specified time range and limit.
+
+
+        ## Request
+
+
+        ### Request URL
+
+
+        `GET localhost:3000/schedule/userid/limit`
+
+
+        ### Request Parameters
+
+
+        - `startDate` (query, required) - The start date in Unix timestamp
+        format.
+            
+        - `endDate` (query, required) - The end date in Unix timestamp format.
+            
+
+        ## Response
+
+
+        The response for this request follows the JSON schema below:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "schedule": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  // Properties of the schedule item
+                }
+              }
+            }
+          }
+        }
+
+         ```
+
+        The response contains an array of schedule items for the specified user
+        within the given time range.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: a4ed644d-97b7-4724-ad0e-a2e62596be8f
+        - name: startDate
+          in: query
+          schema:
+            type: integer
+          example: '1711950631'
+        - name: endDate
+          in: query
+          schema:
+            type: integer
+          example: '1712814631'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{id}/student/edit:
+    post:
+      tags:
+        - schedule
+      summary: edit student per schedule
+      description: >-
+        The API endpoint `localhost:3000/schedule/:id/student/edit` is a POST
+        request used to edit the schedule for a specific student. The request
+        should include a payload with the following parameters in the raw
+        request body:
+
+
+        - `pickUpLocation`: An object containing the latitude, longitude, and
+        address of the pick-up location.
+            
+        - `studentId`: The unique identifier of the student.
+            
+        - `isRecurrence`: A boolean indicating whether the schedule is recurring
+        or not.
+            
+        - `schedules`: An array of objects representing the schedule for each
+        day, including the day, pick-up time, and drop-off time.
+            
+        - `dropOffLocation`: An object containing the latitude, longitude, and
+        address of the drop-off location.
+            
+
+        The response of this request is a JSON schema representing the structure
+        of the response data, including the data types and properties of the
+        returned JSON object.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                pickUpLocation:
+                  latitude: 36.778261
+                  longitude: -119.4179324
+                  address: California
+                studentId: 644a5f93-81a2-4682-a975-f366a62bf4e6
+                isRecurrence: false
+                schedules:
+                  - day: Mon
+                    pickUpTime: 12:00 AM
+                    dropOffTime: 01:00 AM
+                  - pickUpTime: 12:00 AM
+                    dropOffTime: 02:30 AM
+                    day: Wed
+                dropOffLocation:
+                  latitude: 41.875952
+                  longitude: 12.475694
+                  address: Monte Testaccio
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 842112a5-e455-4bb8-945f-fa2ee9eb46e1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{id}/student/delete/{studentId}:
+    delete:
+      tags:
+        - schedule
+      summary: delete student per schedule
+      description: >-
+        ### Delete Student from Schedule
+
+
+        This endpoint is used to delete a student from a specific schedule.
+
+
+        #### Request
+
+
+        - Method: DELETE
+            
+        - URL: `localhost:3000/schedule/:id/student/delete/:studentId`
+            
+        - Path Parameters:
+            
+            - `id`: The ID of the schedule from which the student needs to be deleted.
+                
+            - `studentId`: The ID of the student to be deleted from the schedule.
+                
+
+        #### Response
+
+
+        The response for this request is a JSON schema. The schema includes the
+        following properties:
+
+
+        - `status`: (string) The status of the request, indicating success or
+        failure.
+            
+        - `message`: (string) A message providing additional information about
+        the status.
+            
+
+        Example Response:
+
+
+        ``` json
+
+        {
+          "status": "success",
+          "message": "Student deleted from the schedule successfully."
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 25949b1d-6b03-41f1-bfa7-90bc864b6195
+        - name: studentId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: bdef9f27-3781-4a6f-97c5-bd9a73d2681a
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cancel/students:
+    post:
+      tags:
+        - routes
+      summary: cancel ride
+      description: |-
+        ### Cancel Request
+
+        This endpoint is used to cancel a specific action.
+
+        **Request Body**
+
+        - The request does not require any parameters in the request body.
+            
+
+        **Response**  
+        The response will include the status of the cancellation request.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /card/user/{id}:
+    get:
+      tags:
+        - payments
+      summary: get cards by customer id
+      description: >-
+        # Get User's Payment Card Details
+
+
+        This endpoint retrieves the payment card details for a specific user.
+
+
+        ## Request
+
+
+        ### Request URL
+
+
+        - `GET` {{localbackendurl}}payment/card/user/:id
+            
+
+        ### Request Parameters
+
+
+        - `id` (path parameter) - The unique identifier of the user.
+            
+
+        ## Response
+
+
+        The response will be a JSON object with the following properties:
+
+
+        - `cardNumber` (string) - The masked card number associated with the
+        user.
+            
+        - `expiryDate` (string) - The expiry date of the card.
+            
+        - `cardType` (string) - The type of the card (e.g. Visa, Mastercard).
+            
+        - `cardHolderName` (string) - The name of the cardholder.
+            
+
+        Example:
+
+
+        ``` json
+
+        {
+            "cardNumber": "**** **** **** 1234",
+            "expiryDate": "12/23",
+            "cardType": "Visa",
+            "cardHolderName": "John Doe"
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: 23c80844-9db9-45e2-993e-4c0919a0ad56
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: cus_PSWGCiiCY8NJdE
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /connectiontoken:
+    get:
+      tags:
+        - payments
+      summary: generate token
+      description: >-
+        ### Get Payment Connection Token
+
+
+        This endpoint is used to retrieve a connection token for payment
+        processing.
+
+
+        #### Request
+
+
+        No request body is required for this request.
+
+
+        - `backendurl`: (string) The base URL of the backend.
+            
+
+        #### Response
+
+
+        The response for this request is a JSON object with the following
+        properties:
+
+
+        - `token`: (string) The connection token for payment processing.
+            
+
+        ``` json
+
+        {
+            "token": "..."
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /create/setup/intent:
+    get:
+      tags:
+        - payments
+      summary: create setup intent
+      description: >-
+        ### Create Payment Setup Intent
+
+
+        This endpoint sends an HTTP GET request to create a payment setup
+        intent.
+
+
+        #### Request
+
+
+        The request does not require a request body. It includes the following
+        parameters in the URL:
+
+
+        - `localbackendurl`: The base URL for the local backend.
+            
+
+        #### Response
+
+
+        The response will be a JSON object representing the payment setup
+        intent. Below is a JSON schema for the response:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "client_secret": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "payment_method_types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "usage": {
+              "type": "string"
+            }
+            // ... (other properties)
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /create/setup/intent/key:
+    get:
+      tags:
+        - payments
+      summary: create setup intents
+      description: >-
+        This endpoint makes an HTTP GET request to retrieve the setup intent key
+        for creating a payment.
+
+
+        ### Request
+
+
+        No request body parameters are required for this request.
+
+
+        ### Response
+
+
+        The response will be a JSON object containing the setup intent key,
+        which can be used to initiate the payment setup process.
+
+
+        #### JSON Schema
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "setupIntentKey": {
+              "type": "string",
+              "description": "The key for the setup intent to be used for payment setup"
+            }
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{id}/createEphemeralKeys:
+    get:
+      tags:
+        - payments
+      summary: create ephemeral keys
+      description: >-
+        ### Create Ephemeral Keys
+
+
+        This endpoint is used to create ephemeral keys for a specific payment
+        ID.
+
+
+        #### Request
+
+
+        - Method: GET
+            
+        - URL: `{{localbackendurl}}payment/:id/createEphemeralKeys`
+            
+
+        #### Response
+
+
+        The response for this request can be described using the following JSON
+        schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "secret": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: cus_PQ65p1MB5ZXJMy
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /sheet/:
+    post:
+      tags:
+        - payments
+      summary: payment sheet
+      description: >-
+        # POST /payment/sheet/
+
+
+        This endpoint is used to submit payment details for a customer.
+
+
+        ## Request Body
+
+
+        - `amount` (number, required): The amount of the payment.
+            
+        - `customerId` (string, required): The unique identifier of the
+        customer.
+            
+
+        ## Response
+
+
+        The response for this request is a JSON object conforming to the
+        following schema:
+
+
+        ``` json
+
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "transactionId": {
+              "type": "string"
+            }
+          }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                amount: 100
+                customerId: sample customer id
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /create/customer:
+    post:
+      tags:
+        - payments
+      summary: create customer
+      description: >-
+        ### Create Customer Payment
+
+
+        This endpoint is used to create a new payment for a customer.
+
+
+        #### Request Body Parameters
+
+
+        - `customer_id` (string) - The ID of the customer for whom the payment
+        is being created.
+            
+        - `amount` (number) - The amount of the payment.
+            
+
+        #### Response
+
+
+        Upon successful creation of the payment, the response will include the
+        following:
+
+
+        - `payment_id` (string) - The ID of the newly created payment.
+            
+        - `customer_id` (string) - The ID of the customer for whom the payment
+        was created.
+            
+        - `amount` (number) - The amount of the payment.
+            
+        - `timestamp` (string) - The timestamp of the payment creation.
+            
+
+        If there is an error in creating the payment, the response will include
+        an error message.
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /{id}/attach:
+    post:
+      tags:
+        - payments
+      summary: attach payment method
+      description: >-
+        ### POST /payment/:id/attach
+
+
+        This endpoint is used to attach a payment to a specific ID.
+
+
+        #### Request
+
+
+        The request body should be sent in JSON format and include the following
+        parameter:
+
+
+        - `customerId`: The ID of the customer to whom the payment is being
+        attached.
+            
+
+        Example:
+
+
+        ``` json
+
+        {
+            "customerId": "cus_PQ65p1MB5ZXJMy"
+        }
+
+        #### Response
+
+        The response for this request follows the JSON schema below:
+
+        ```json
+
+        {
+            "type": "object",
+            "properties": {
+                // Define the properties of the response here
+            }
+        }
+
+         ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                customerId: cus_PQ65p1MB5ZXJMy
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: pm_1OcMXcIGdlw8igcx0sCeImZQ
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /parent/status/{id}:
+    get:
+      tags:
+        - routes
+      summary: parent ride status
+      description: >-
+        This endpoint retrieves the status of a parent's ride with the specified
+        ID.
+
+
+        The response will have a status code of 200, indicating a successful
+        request, and the data will be in JSON format. The response includes a
+        "success" key with a boolean value, and a "data" key containing
+        information about the ride status, students, driver, pick-up and
+        drop-off locations, and recurrence details.
+
+
+        The "students" array includes information about the students
+        participating in the ride, such as their ID, drop-off location (address,
+        latitude, and longitude), days of the ride (including drop-off and
+        pick-up times), and recurrence status.
+
+
+        The "rideStatus" key provides information about the status of the ride,
+        and the "driver" key contains details about the driver assigned to the
+        ride.
+
+
+        Please note that specific student and driver details are not included in
+        the response for privacy reasons.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: c8518ac6-f7a2-45b2-8184-d1866c6d94c1
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 660bb9b5-5136-49ae-8236-7cabc3201f55
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /all/rooms:
+    get:
+      tags:
+        - chat
+      summary: all chat rooms
+      description: |-
+        ### Get All Chat Rooms
+
+        This endpoint retrieves a list of all chat rooms.
+
+        #### Request
+
+        - Method: GET
+            
+        - URL: `{{localbackendurl}}chat/all/rooms`
+            
+
+        #### Response
+
+        The response will be a JSON object with the following schema:
+
+        ``` json
+        {
+          "type": "object",
+          "properties": {
+            "rooms": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roomId": {
+                    "type": "string"
+                  },
+                  "roomName": {
+                    "type": "string"
+                  },
+                  "createdBy": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        }
+
+         ```
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: 1be2bb16-333f-4547-9fad-4f5da8178715
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /details/{id}:
+    get:
+      tags:
+        - chat
+      summary: chat room details
+      description: >-
+        This endpoint retrieves details of a chat based on the provided ID. The
+        response of this request is a JSON schema representing the structure of
+        the data returned by the API.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: c617a4ef-a908-4269-9bc5-fe864f2b74e9
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 4835c4b1-21ac-4464-bb08-c98d8662bdaf
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /delete/selected:
+    post:
+      tags:
+        - chat
+      summary: delete selected chat by chat id
+      description: >-
+        ### Chat Delete Selected
+
+
+        This endpoint is used to delete selected chat messages.
+
+
+        #### Request Body
+
+
+        - **id** (array of strings, required): An array of message IDs to be
+        deleted.
+            
+
+        Example:
+
+
+        ``` json
+
+        {
+          "id": ["sadas123"]
+        }
+
+         ```
+
+        #### Response
+
+
+        The response will indicate the success or failure of the delete
+        operation.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                id:
+                  - sadas123
+                  - sdfsdfs12312
+                  - asdas31231
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /list/add:
+    post:
+      tags:
+        - whiteList
+      summary: add whiteList
+      description: >-
+        This endpoint allows you to add a new item to the white list. The
+        request should be sent as an HTTP POST to
+        {{localbackendurl}}white/list/add. The request body should be in raw
+        format and include the following parameters:
+
+
+        - country (string): The country to be added to the white list.
+            
+        - stateLoc (string): The state/location within the country to be added
+        to the white list.
+            
+        - city (string): The city within the state/location to be added to the
+        white list.
+            
+
+        Upon a successful request, the response will contain the updated white
+        list data.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                country:
+                  - united states
+                stateLoc:
+                  - california
+                city:
+                  - bulaho
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /list/remove:
+    post:
+      tags:
+        - whiteList
+      summary: remove whiteList
+      description: >-
+        ### POST /white/list/remove
+
+
+        This endpoint is used to remove items from the white list.
+
+
+        #### Request Body
+
+
+        - country (array of strings, required): The list of countries to be
+        removed from the white list.
+            
+        - stateLoc (array of strings, required): The list of states/locations to
+        be removed from the white list.
+            
+        - city (array of strings, required): The list of cities to be removed
+        from the white list.
+            
+
+        #### Response
+
+
+        The response will indicate the success or failure of the removal
+        operation.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                country:
+                  - usa
+                stateLoc:
+                  - ca
+                city:
+                  - san ramon
+                  - danville
+                  - dublin
+                  - pleasanton
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /list/check:
+    get:
+      tags:
+        - whiteList
+      summary: check white list
+      description: >-
+        This endpoint makes an HTTP GET request to retrieve a list check for
+        white items based on the provided country, state, and city parameters.
+
+
+        ### Request Parameters
+
+
+        - `country`: The country for which the list check is to be performed.
+            
+        - `stateLoc`: The state within the country for the list check.
+            
+        - `city`: The city within the specified state for the list check.
+            
+
+        ### Response Body
+
+
+        The response will include the list check results for white items based
+        on the provided parameters.
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: country
+          in: query
+          schema:
+            type: string
+          example: usa
+        - name: stateLoc
+          in: query
+          schema:
+            type: string
+          example: ca
+        - name: city
+          in: query
+          schema:
+            type: string
+          example: san ramon
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /ridecostacceptance:
+    post:
+      tags:
+        - ride cost
+      summary: parent acceptance
+      description: >-
+        ### Parent Ride Cost Acceptance
+
+
+        This endpoint is used to indicate the acceptance or rejection of the
+        ride cost by the parent.
+
+
+        #### Request Body
+
+
+        - `acceptance` (boolean): Indicates whether the parent accepts or
+        rejects the ride cost.
+            
+
+        #### Response
+
+
+        The response will include the status of the acceptance action.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                acceptance: true
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{Authorization}}'
+        - name: UserId
+          in: header
+          schema:
+            type: string
+          example: '{{UserId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

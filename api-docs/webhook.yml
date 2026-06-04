@@ -1,0 +1,112 @@
+  /webhook/notify-driver:
+    post:
+      tags:
+        - Webhooks
+      summary: Notify driver webhook
+      description: Webhook endpoint to notify drivers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+                - message
+                - userid
+              properties:
+                status:
+                  type: string
+                  description: Status message title
+                message:
+                  type: string
+                  description: Notification message body
+                userid:
+                  type: string
+                  description: Driver's user ID
+              example:
+                status: "Document Record Verification"
+                message: "Your document verification status has been updated"
+                userid: "12345-67890"
+      responses:
+        '200':
+          description: Successful notification
+        '400':
+          description: Bad request
+  /webhook/booking:
+    post:
+      tags:
+        - Webhooks
+      summary: Booking webhook
+      description: Webhook endpoint for booking events
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - bookingId
+              properties:
+                bookingId:
+                  type: string
+                  description: ID of the booking
+              example:
+                bookingId: "b123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Successful booking webhook
+        '400':
+          description: Bad request
+
+  /webhook/cancel-schedule/parent:
+    post:
+      tags:
+        - Webhooks
+      summary: Cancel schedule webhook
+      description: Webhook endpoint for canceling parent schedules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - scheduleId
+              properties:
+                scheduleId:
+                  type: string
+                  description: ID of the schedule to cancel
+              example:
+                scheduleId: "s123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Successfully canceled schedule
+        '400':
+          description: Bad request
+
+  /webhook/invoice/payment:
+    post:
+      tags:
+        - Webhooks
+      summary: Invoice payment webhook
+      description: Webhook endpoint for invoice payment events
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - paymentId
+              properties:
+                paymentId:
+                  type: string
+                  description: ID of the payment
+              example:
+                paymentId: "p123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Successful payment webhook
+        '400':
+          description: Bad request

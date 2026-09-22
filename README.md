@@ -13,7 +13,6 @@ The backend App Project service for the platform. Built with **Node.js**, **Expr
 - [Project Architecture & Structure](#project-architecture--structure)
 - [Coding Standards & Conventions](#coding-standards--conventions)
 - [API Documentation](#api-documentation)
-- [Refactoring History & Documentation](#refactoring-history--documentation)
 
 ---
 

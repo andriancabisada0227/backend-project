@@ -576,9 +576,9 @@ const verifyEmailInterestRegistration = async (req, res) => {
 const schoolRegistration = async (req, res) => {
   try {
     req.body.id = uuidv4();
-    // const password = req.body.password;
-    // const hashedPassword = await bcrypt.hash(password, 10);
-    // req.body.password = hashedPassword;
+    if (req.body.password) {
+      req.body.password = await bcrypt.hash(req.body.password, 10);
+    }
     req.body.isVerified = false;
     const saveParams = {
       TableName: "schoolRegistrationTable",

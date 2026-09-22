@@ -18,8 +18,8 @@ const { paymentMade } = require("../services/pushnotification");
 const { sendPayment } = require("../mailer");
 const PDFDocument = require("pdfkit");
 const payoutController = require("../app/controllers/payoutController");
+const stripe = require("stripe")(process.env.stripeKey);
 const connectionToken = async (req, res) => {
-  const stripe = require("stripe")(process.env.stripeKey); // replace with your Stripe secret key
   if (await checkUserId(req.header("UserId")))
     return res.status(400).json({ success: false, error: `Invalid User Id` });
 
@@ -297,11 +297,12 @@ const paymentSheet = async (req, res) => {
           })
         );
         // send payout to deriver
-        let payload
-        payload.body = {
-          driverId: req.body.driverUserId,
-          amount: payoutAmount
-        }
+        const payload = {
+          body: {
+            driverId: req.body.driverUserId,
+            amount: payoutAmount,
+          },
+        };
         await payoutController.driverPayout(payload);
 
         return res.status(200).json({ 
@@ -309,7 +310,7 @@ const paymentSheet = async (req, res) => {
           data: {
             paymentIntent: confirmedIntent.client_secret,
             customer: req.body.customerId ?? "",
-            publishableKey: process.env.stripeKey,
+            publishableKey: process.env.stripePublishKey,
             status: confirmedIntent.status
           }
         });
@@ -322,7 +323,7 @@ const paymentSheet = async (req, res) => {
       data: {
         paymentIntent: paymentIntent.client_secret,
         customer: req.body.customerId ?? "",
-        publishableKey: process.env.stripeKey
+        publishableKey: process.env.stripePublishKey
       }
     });
 

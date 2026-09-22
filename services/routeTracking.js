@@ -64,12 +64,13 @@ wss.on("connection", function connection(ws, req) {
   }
 
   ws.on("message", function incoming(message) {
-    //console.log("received: %s", message);
-
-    const data = JSON.parse(message);
-
-    // Emit event for handling location updates
-    eventEmitter.emit("locationUpdate", data, role, scheduleId);
+    try {
+      const data = JSON.parse(message);
+      // Emit event for handling location updates
+      eventEmitter.emit("locationUpdate", data, role, scheduleId);
+    } catch (err) {
+      console.error("Malformed tracking message ignored:", err.message);
+    }
   });
 
   ws.on("close", function () {
@@ -92,7 +93,9 @@ eventEmitter.on("locationUpdate", (data, role, scheduleId) => {
 
   // Send updates to filtered clients
   clientsToUpdate.forEach((client) => {
-    client.ws.send(JSON.stringify(data));
+    if (client.ws && client.ws.readyState === WebSocket.OPEN) {
+      client.ws.send(JSON.stringify(data));
+    }
   });
 });
 

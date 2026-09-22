@@ -12,18 +12,18 @@ require("dotenv").config();
 
 const dynamoDocumentClient = DynamoDBDocumentClient.from(dynamoClient);
 const appConstants = require("./constants/appConstants");
+const crypto = require("crypto");
 const { sendSuccess, sendBadRequest, sendInternalError } = require("./utils/responseHandler");
 const logger = require("./utils/logger");
 
 /**
- * Generate a random OTP with specified length
+ * Generate a random OTP with specified length using CSPRNG
  * @returns {string} Random OTP
  */
 const generateOtp = () => {
-  return Math.floor(
-    Math.pow(10, appConstants.OTP.LENGTH - 1) +
-    Math.random() * (Math.pow(10, appConstants.OTP.LENGTH) - Math.pow(10, appConstants.OTP.LENGTH - 1))
-  ).toString();
+  const min = Math.pow(10, appConstants.OTP.LENGTH - 1);
+  const max = Math.pow(10, appConstants.OTP.LENGTH);
+  return crypto.randomInt(min, max).toString();
 };
 
 /**
@@ -293,9 +293,10 @@ const verifyOtp = async (req, res) => {
         Key: {
           id: user.id,
         },
-        UpdateExpression: "SET #isVerifiedAttr = :isVerified",
+        UpdateExpression: "SET #isVerifiedAttr = :isVerified REMOVE #otp",
         ExpressionAttributeNames: {
           "#isVerifiedAttr": "isVerified",
+          "#otp": "otp",
         },
         ExpressionAttributeValues: {
           ":isVerified": true,
@@ -307,9 +308,13 @@ const verifyOtp = async (req, res) => {
 
       logger.info("Phone number verified successfully", { phoneNumber, userId: user.id });
 
-      const token = jwt.sign({ phoneNumber }, process.env.jwtSecretToken, {
-        expiresIn: appConstants.JWT.EXPIRY_STRING,
-      });
+      const token = jwt.sign(
+        { id: user.id, userId: user.id, phoneNumber, role: user.role || "" },
+        process.env.jwtSecretToken,
+        {
+          expiresIn: appConstants.JWT.EXPIRY_STRING,
+        }
+      );
 
       return sendSuccess(res, appConstants.HTTP_STATUS.OK, appConstants.SUCCESS_MESSAGES.PHONE_VERIFIED, {
         token,
@@ -317,6 +322,19 @@ const verifyOtp = async (req, res) => {
         userId: user.id,
       });
     }
+
+    // Invalidate OTP immediately to prevent reuse
+    const clearOtpParams = {
+      TableName: appConstants.TABLES.SIGNUP,
+      Key: {
+        id: user.id,
+      },
+      UpdateExpression: "REMOVE #otp",
+      ExpressionAttributeNames: {
+        "#otp": "otp",
+      },
+    };
+    await dynamoDocumentClient.send(new UpdateCommand(clearOtpParams));
 
     // User already verified - handle sign in
     logger.info("Attempting sign in with verified phone number", { phoneNumber, userId: user.id });
@@ -338,9 +356,13 @@ const verifyOtp = async (req, res) => {
 
     if (parentResult.Items.length > 0) {
       const parentData = parentResult.Items[0];
-      const token = jwt.sign({ phoneNumber }, process.env.jwtSecretToken, {
-        expiresIn: appConstants.JWT.EXPIRY_STRING,
-      });
+      const token = jwt.sign(
+        { id: user.id, userId: user.id, phoneNumber, role: "PARENT" },
+        process.env.jwtSecretToken,
+        {
+          expiresIn: appConstants.JWT.EXPIRY_STRING,
+        }
+      );
 
       return sendSuccess(res, appConstants.HTTP_STATUS.OK, appConstants.SUCCESS_MESSAGES.SIGNIN_SUCCESS, {
         token,
@@ -368,9 +390,13 @@ const verifyOtp = async (req, res) => {
 
     if (driverResult.Items.length > 0) {
       const driverData = driverResult.Items[0];
-      const token = jwt.sign({ phoneNumber }, process.env.jwtSecretToken, {
-        expiresIn: appConstants.JWT.EXPIRY_STRING,
-      });
+      const token = jwt.sign(
+        { id: user.id, userId: user.id, phoneNumber, role: "DRIVER" },
+        process.env.jwtSecretToken,
+        {
+          expiresIn: appConstants.JWT.EXPIRY_STRING,
+        }
+      );
 
       return sendSuccess(res, appConstants.HTTP_STATUS.OK, appConstants.SUCCESS_MESSAGES.SIGNIN_SUCCESS, {
         token,
@@ -382,9 +408,13 @@ const verifyOtp = async (req, res) => {
     }
 
     // No parent or driver record found - still allow sign in
-    const token = jwt.sign({ phoneNumber }, process.env.jwtSecretToken, {
-      expiresIn: appConstants.JWT.EXPIRY_STRING,
-    });
+    const token = jwt.sign(
+      { id: user.id, userId: user.id, phoneNumber, role: user.role || "" },
+      process.env.jwtSecretToken,
+      {
+        expiresIn: appConstants.JWT.EXPIRY_STRING,
+      }
+    );
 
     return sendSuccess(res, appConstants.HTTP_STATUS.OK, appConstants.SUCCESS_MESSAGES.SIGNIN_SUCCESS, {
       token,

@@ -279,9 +279,13 @@ const emailSignIn = async (req, res) => {
       }
     }
 
-    const token = jwt.sign({ email }, process.env.jwtSecretToken, {
-      expiresIn: appConstants.JWT.EXPIRY_STRING,
-    });
+    const token = jwt.sign(
+      { id: user.id, userId: user.id, email, role: user.role || "" },
+      process.env.jwtSecretToken,
+      {
+        expiresIn: appConstants.JWT.EXPIRY_STRING,
+      }
+    );
 
     logger.info("Email sign-in successful", { email, userId: user.id });
 
@@ -362,9 +366,13 @@ const emailVerification = async (req, res) => {
     const updateCommand = new UpdateCommand(updateParams);
     await dynamoDocumentClient.send(updateCommand);
 
-    const authToken = jwt.sign({ email }, process.env.jwtSecretToken, {
-      expiresIn: appConstants.JWT.EXPIRY_STRING,
-    });
+    const authToken = jwt.sign(
+      { id: user.id, userId: user.id, email, role: user.role || "" },
+      process.env.jwtSecretToken,
+      {
+        expiresIn: appConstants.JWT.EXPIRY_STRING,
+      }
+    );
 
     logger.info("Email successfully verified", { email, userId: user.id });
 

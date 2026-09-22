@@ -35,22 +35,34 @@ let clients = {};
 
 wss.on("connection", (ws, req) => {
   const location = new url.URL(req.url, `http://${req.headers.host}`);
-  const userID = location.searchParams.get("UserId") ?? "userId";
+  let token = null;
   const authHeader = req.headers['authorization'];
-  if (authHeader && authHeader != '') {
-    try {
-      const token = authHeader.split(' ')[1];
-      jwt.verify(token, process.env.jwtSecretToken);
-      console.log("token", token);
-    } catch (error) {
-      ws.send(JSON.stringify({ error: "Invalid token" }));
-      ws.close();
-      return;
-    }
+  if (authHeader && authHeader.trim() !== "") {
+    token = authHeader.startsWith('Bearer ') || authHeader.startsWith('bearer ')
+      ? authHeader.slice(7).trim()
+      : authHeader.trim();
+  } else if (location.searchParams.get("token")) {
+    token = location.searchParams.get("token").trim();
   }
 
+  if (!token) {
+    ws.send(JSON.stringify({ error: "Authentication token is required." }));
+    ws.close(4001, "Authentication token required");
+    return;
+  }
 
+  let authenticatedUserId = null;
+  try {
+    const decoded = jwt.verify(token, process.env.jwtSecretToken);
+    authenticatedUserId = decoded.userId || decoded.id;
+  } catch (error) {
+    ws.send(JSON.stringify({ error: "Invalid or expired token." }));
+    ws.close(4001, "Invalid token");
+    return;
+  }
 
+  const requestedUserId = location.searchParams.get("UserId");
+  const userID = authenticatedUserId || requestedUserId || "userId";
 
   eventEmitter.emit("newConnection", ws, userID);
 
@@ -85,7 +97,7 @@ eventEmitter.on("messageReceived", (ws, message, userID) => {
         saveMessageToDynamoDB(messageData);
 
         const receiverWs = clients[messageData.receiverUserID];
-        if (receiverWs) {
+        if (receiverWs && receiverWs.readyState === WebSocket.OPEN) {
           receiverWs.send(JSON.stringify(messageData));
         } else {
           console.log("Receiver not connected:", messageData.receiverUserID);

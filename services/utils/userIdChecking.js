@@ -1,14 +1,12 @@
 const { dynamoClient } = require("../../config/aws");
 const {
-  PutCommand,
   GetCommand,
   DynamoDBDocumentClient,
-  ScanCommand,
-  UpdateCommand,
 } = require("@aws-sdk/lib-dynamodb");
 const dynamoDocumentClient = DynamoDBDocumentClient.from(dynamoClient);
 
 const checkUserId = async (userId) => {
+  if (!userId) return true;
   const userIdParentsParams = {
     TableName: "signupTable",
     Key: {
@@ -20,14 +18,15 @@ const checkUserId = async (userId) => {
     const getCommand = new GetCommand(userIdParentsParams);
     const result = await dynamoDocumentClient.send(getCommand);
 
-    if (result.Item.id != "" || result.Item.id != undefined) return false;
+    if (result.Item && result.Item.id) return false;
     return true;
   } catch (error) {
-    return error;
+    return true;
   }
 };
 
 const checkParent = async (userId) => {
+  if (!userId) return true;
   const userIdParentsParams = {
     TableName: "signupTable",
     Key: {
@@ -39,15 +38,16 @@ const checkParent = async (userId) => {
     const getCommand = new GetCommand(userIdParentsParams);
     const result = await dynamoDocumentClient.send(getCommand);
 
-    if (result.Item.role === "DRIVER") return true;
+    if (result.Item && result.Item.role === "DRIVER") return true;
 
     return false;
   } catch (error) {
-    return error;
+    return true;
   }
 };
 
 const checkDriver = async (userId) => {
+  if (!userId) return true;
   const userIdParentsParams = {
     TableName: "signupTable",
     Key: {
@@ -59,11 +59,11 @@ const checkDriver = async (userId) => {
     const getCommand = new GetCommand(userIdParentsParams);
     const result = await dynamoDocumentClient.send(getCommand);
 
-    if (result.Item.role.toUpperCase() === "PARENT") return true;
+    if (result.Item && result.Item.role && result.Item.role.toUpperCase() === "PARENT") return true;
 
     return false;
   } catch (error) {
-    return error;
+    return true;
   }
 };
 

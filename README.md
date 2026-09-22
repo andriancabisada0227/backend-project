@@ -125,11 +125,10 @@ core/
 │   ├── repository/
 │   └── services/
 ├── api-docs/                      # OpenAPI / Swagger specification files
-│   ├── drivers.yml
-│   ├── parents.yml
-│   ├── customer-support.yml
-│   └── web.yml
-└── REFACTORING_NOTES.md           # Refactoring standards and guidelines
+   ├── drivers.yml
+   ├── parents.yml
+   ├── customer-support.yml
+   └── web.yml
 ```
 
 ---

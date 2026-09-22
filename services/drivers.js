@@ -478,59 +478,6 @@ const getAllDrivers = async (req, res) => {
  *               success: false
  *               error: Internal Server Error
  */
-const searchFilters = async (req, res) => {
-  const gender = req.query.gender;
-  const vehicleType = req.query.vehicleType;
-  const ageLimit_low = req.query.ageLimit_low;
-  const ageLimit_high = req.query.ageLimit_high;
-  const parentUserid = req.header("UserId");
-  let taxiCode = "";
-  const query = {
-    TableName: appConstants.TABLES.SIGNUP,
-    Key: {
-      id: req.header("UserId"),
-    },
-  };
-
-  const getCommand = new GetCommand(query);
-  const user = await dynamoDocumentClient.send(getCommand);
-
-  if (user.Item === undefined)
-    return sendBadRequest(res, appConstants.ERROR_MESSAGES.INVALID_USER_ID);
-
-  const parentsParams = new ScanCommand({
-    TableName: appConstants.TABLES.PARENTS,
-    FilterExpression: "#userId = :userId",
-    ExpressionAttributeNames: {
-      "#userId": "userId",
-    },
-    ExpressionAttributeValues: {
-      ":userId": parentUserid,
-    },
-  });
-  const parentData = await dynamoDocumentClient.send(parentsParams);
-  const zipcodeParams = parentData.Items[0].zipcode;
-  if (!zipcodeParams || isNaN(zipcodeParams)) {
-    return sendBadRequest(res, "Parent has no valid zipcode");
-  }
-
-  const attributName = "zipCode";
-  const taxiParams = new ScanCommand({
-    TableName: appConstants.TABLES.TAXI,
-    ExpressionAttributeValues: {
-      ":attribute": zipcodeParams,
-    },
-    FilterExpression: `contains(${attributName}, :attribute)`,
-  });
-
-  const taxiData = await dynamoDocumentClient.send(taxiParams);
-
-  if (taxiData.Items.length === 0) {
-    return sendSuccess(res, appConstants.HTTP_STATUS.OK, "No taxi services available in your zipcode", { data: [] });
-  }
-
-  const taxiCodes = taxiData.Items.map((item) => item.taxiCode);
-
 // Helper function to build filter expressions for driver search
 const buildDriverFilterExpression = (gender, vehicleType, ageLimit_low, ageLimit_high, taxiCodes) => {
   const queryParams = {
@@ -1236,7 +1183,11 @@ const searchDriversByLocation = async (req, res) => {
   if (await checkUserId(req.header("UserId")))
     return sendBadRequest(res, appConstants.ERROR_MESSAGES.INVALID_USER_ID);
 
-  let taxiCode = "";
+  const location = req.query.location;
+  if (!location) {
+    return sendBadRequest(res, "Location parameter is required");
+  }
+
   const queryParams = {
     TableName: appConstants.TABLES.SIGNUP,
     Key: {
@@ -1244,132 +1195,47 @@ const searchDriversByLocation = async (req, res) => {
     },
   };
 
-  const getCommand = new GetCommand(queryParams);
-  const user = await dynamoDocumentClient.send(getCommand);
-
-  taxiCode = user.Item.TaxiCode;
-
-  const params = {
-    TableName: appConstants.TABLES.DRIVERS,
-    FilterExpression:
-      "contains(#city, :value) or contains(#state, :value) or contains(#country, :value), TaxiCode=:TaxiCode",
-    ExpressionAttributeNames: {
-      "#city": "city",
-      "#state": "state",
-      "#country": "country",
-    },
-    ExpressionAttributeValues: {
-      ":value": req.query.location,
-      ":TaxiCode": taxiCode,
-    },
-  };
-
   try {
+    const getCommand = new GetCommand(queryParams);
+    const user = await dynamoDocumentClient.send(getCommand);
+    const taxiCode = user?.Item?.TaxiCode;
+
+    const params = {
+      TableName: appConstants.TABLES.DRIVERS,
+      FilterExpression:
+        "(contains(#city, :value) or contains(#state, :value) or contains(#country, :value)) and TaxiCode = :TaxiCode",
+      ExpressionAttributeNames: {
+        "#city": "city",
+        "#state": "state",
+        "#country": "country",
+      },
+      ExpressionAttributeValues: {
+        ":value": location,
+        ":TaxiCode": taxiCode,
+      },
+    };
+
     const scanCommand = new ScanCommand(params);
     const userData = await dynamoDocumentClient.send(scanCommand);
-    if (userData.Items.length != 0) {
-      const resultUpdateStudentDetails = await updateStudentDetails(
-        driversWithinRadius,
+    if (userData.Items && userData.Items.length !== 0) {
+      const resultStudentDetails = await updateStudentDetails(
+        userData.Items,
         "scan",
       );
-      const resultUpdateParentDetails = await updateParentDetails(
-        resultUpdateStudentDetails,
+      const resultReviewDetails = await updateParentDetails(
+        resultStudentDetails,
         "scan",
       );
 
-      for (const item of resultReviewDetails) {
-        const driverParams = {
-          TableName: appConstants.TABLES.BOOKINGS,
-          FilterExpression:
-            "#driverId = :driverId and #bookingStatus = :bookingStatus",
-          ExpressionAttributeNames: {
-            "#driverId": "driverId",
-            "#bookingStatus": "bookingStatus",
-          },
-          ExpressionAttributeValues: {
-            ":driverId": item.id,
-            ":bookingStatus": "ACCEPTED",
-          },
-        };
-        const scanCommand = new ScanCommand(driverParams);
-        const userData = await dynamoDocumentClient.send(scanCommand);
+      const enrichedDrivers = await enrichDriversWithDetails(resultReviewDetails);
+      const normalizedDrivers = normalizeDriverLocation(enrichedDrivers);
 
-        if (userData.Items.length !== 0) {
-          const uniqueScheduleIds = new Set();
-          const uniqueKeys = [];
-
-          // Filter out duplicate scheduleIds and create unique keys
-          userData.Items.forEach((item) => {
-            if (!uniqueScheduleIds.has(item.scheduleId)) {
-              uniqueScheduleIds.add(item.scheduleId);
-              uniqueKeys.push({ id: item.scheduleId });
-            }
-          });
-          const params = {
-            RequestItems: {
-              schedulesTable: {
-                Keys: uniqueKeys,
-              },
-            },
-          };
-
-          const getCommand = new BatchGetCommand(params);
-          const scheduleResult = await dynamoDocumentClient.send(getCommand);
-
-          if (scheduleResult.Responses.schedulesTable.length !== 0) {
-            let result = [];
-            for (const item of scheduleResult.Responses.schedulesTable) {
-              result.push(item.students);
-            }
-            for (const item of result) {
-              for (const student of item) {
-                const params = {
-                  TableName: appConstants.TABLES.STUDENTS,
-                  Key: {
-                    id: student.studentId,
-                  },
-                };
-
-                const getCommand = new GetCommand(params);
-                const user = await dynamoDocumentClient.send(getCommand);
-
-                if (user.Item !== undefined) {
-                  student.imageUrl = user.Item.imageUrl;
-                  student.studentName = user.Item.studentName;
-                  student.schoolName = user.Item.schoolName;
-                  student.age = user.Item.age;
-                  student.grade = user.Item.grade;
-                }
-              }
-            }
-            result[0].forEach((studentsArray) => {
-              delete studentsArray.pickUpLocation;
-              delete studentsArray.dropOffLocation;
-              delete studentsArray.days;
-              delete studentsArray.isRecurrence;
-            });
-
-            item.totalStudents = result[0].length;
-            item.students = result[0];
-          }
-        }
-      }
-
-      resultUpdateParentDetails.forEach((obj) => {
-        // Check if the object has a driverLocation property
-        if (obj.hasOwnProperty("driverLocation")) {
-          // If yes, rename the property to location and assign its value
-          obj.location = obj.driverLocation;
-          // Delete the driverLocation property
-          delete obj.driverLocation;
-        }
-      });
       return sendSuccess(
         res,
         appConstants.HTTP_STATUS.OK,
         appConstants.SUCCESS_MESSAGES.DRIVERS_RETRIEVED,
         paginationDriversList(
-          resultUpdateParentDetails,
+          normalizedDrivers,
           req.query.pagesize,
           req.query.page,
         ),
@@ -1383,7 +1249,7 @@ const searchDriversByLocation = async (req, res) => {
       { data: [] },
     );
   } catch (error) {
-    logger.error("Error searching drivers", error);
+    logger.error("Error searching drivers by location", error);
     return sendInternalError(
       res,
       appConstants.ERROR_MESSAGES.INTERNAL_ERROR,

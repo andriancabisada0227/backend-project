@@ -1,66 +1,76 @@
 const { dynamoClient } = require("../config/aws");
 const {
-  GetCommand,
   DynamoDBDocumentClient,
   ScanCommand,
   PutCommand,
-  DeleteCommand,
   UpdateCommand,
 } = require("@aws-sdk/lib-dynamodb");
 
 require("dotenv").config();
-
 const { v4: uuidv4 } = require("uuid");
 const dynamoDocumentClient = DynamoDBDocumentClient.from(dynamoClient);
 
+const appConstants = require("./constants/appConstants");
+const {
+  sendSuccess,
+  sendBadRequest,
+  sendInternalError,
+} = require("./utils/responseHandler");
+const logger = require("./utils/logger");
+
+const WHITELIST_TABLE = "whiteListTable";
+
 const addWhiteList = async (req, res) => {
   try {
-    //
     const params = {
-      TableName: "whiteListTable",
+      TableName: WHITELIST_TABLE,
     };
 
     const command = new ScanCommand(params);
     const data = await dynamoDocumentClient.send(command);
 
-    if (data.Items.length !== 0) {
-      //update
+    if (data.Items && data.Items.length !== 0) {
+      const currentItem = data.Items[0];
+      currentItem.country = currentItem.country || [];
+      currentItem.stateLoc = currentItem.stateLoc || [];
+      currentItem.city = currentItem.city || [];
 
-      if (req.body.country !== undefined)
+      if (req.body.country !== undefined) {
         req.body.country.forEach((item) => {
-          if (!data.Items[0].country.includes(item)) {
-            data.Items[0].country.push(item);
+          if (!currentItem.country.includes(item)) {
+            currentItem.country.push(item);
           }
         });
+      }
 
-      // Update stateLoc
-      if (req.body.stateLoc !== undefined)
+      if (req.body.stateLoc !== undefined) {
         req.body.stateLoc.forEach((item) => {
-          if (!data.Items[0].stateLoc.includes(item)) {
-            data.Items[0].stateLoc.push(item);
+          if (!currentItem.stateLoc.includes(item)) {
+            currentItem.stateLoc.push(item);
           }
         });
+      }
 
-      // Update city
-      if (req.body.city !== undefined)
+      if (req.body.city !== undefined) {
         req.body.city.forEach((item) => {
-          if (!data.Items[0].city.includes(item)) {
-            data.Items[0].city.push(item);
+          if (!currentItem.city.includes(item)) {
+            currentItem.city.push(item);
           }
         });
+      }
+
       const updateExpression =
-        "set country =:country, stateLoc =:stateLoc, city =:city";
+        "set country = :country, stateLoc = :stateLoc, city = :city";
       const expressionAttributeValues = {
-        ":country": data.Items[0].country,
-        ":stateLoc": data.Items[0].stateLoc,
-        ":city": data.Items[0].city,
+        ":country": currentItem.country,
+        ":stateLoc": currentItem.stateLoc,
+        ":city": currentItem.city,
       };
-    
 
       const updateParams = {
-        TableName: "whiteListTable",
+        TableName: WHITELIST_TABLE,
         Key: {
-          id: data.Items[0].id,
+          id: currentItem.id,
         },
         UpdateExpression: updateExpression,
         ExpressionAttributeValues: expressionAttributeValues,
@@ -70,77 +80,87 @@ const addWhiteList = async (req, res) => {
       const updateCommand = new UpdateCommand(updateParams);
       await dynamoDocumentClient.send(updateCommand);
 
-      return res.status(200).json({
-        success: true,
-        message: "Successfully Updated WhiteList Data",
-      });
+      return sendSuccess(
+        res,
+        appConstants.HTTP_STATUS.OK,
+        "Successfully Updated WhiteList Data",
+      );
     } else {
-      //save first data
       req.body.id = uuidv4();
       const addParams = {
-        TableName: "whiteListTable",
+        TableName: WHITELIST_TABLE,
         Item: req.body,
       };
 
       const putCommand = new PutCommand(addParams);
       await dynamoDocumentClient.send(putCommand);
 
-      return res
-        .status(200)
-        .json({ success: true, message: "Successfully Added WhiteList Data" });
+      return sendSuccess(
+        res,
+        appConstants.HTTP_STATUS.OK,
+        "Successfully Added WhiteList Data",
+      );
     }
   } catch (error) {
-    return res.status(500).json({ success: false, error: `${error}` });
+    logger.error("Error in addWhiteList", error);
+    return sendInternalError(res, "Failed to update whitelist", error);
   }
 };
 
 const removeWhiteList = async (req, res) => {
   try {
-    //
     const params = {
-      TableName: "whiteListTable",
+      TableName: WHITELIST_TABLE,
     };
     const command = new ScanCommand(params);
     const data = await dynamoDocumentClient.send(command);
-    if (data.Items.length === 0)
-      return res
-        .status(400)
-        .json({ success: false, error: "No Data to Delete" });
+    if (!data.Items || data.Items.length === 0) {
+      return sendBadRequest(res, "No Data to Delete");
+    }
 
-    req.body.country.forEach((item) => {
-      let index = data.Items[0].country.indexOf(item);
-      if (index !== -1) {
-        data.Items[0].country.splice(index, 1);
-      }
-    });
+    const currentItem = data.Items[0];
+    currentItem.country = currentItem.country || [];
+    currentItem.stateLoc = currentItem.stateLoc || [];
+    currentItem.city = currentItem.city || [];
 
-    // Remove stateLoc
-    req.body.stateLoc.forEach((item) => {
-      let index = data.Items[0].stateLoc.indexOf(item);
-      if (index !== -1) {
-        data.Items[0].stateLoc.splice(index, 1);
-      }
-    });
+    if (req.body.country) {
+      req.body.country.forEach((item) => {
+        const index = currentItem.country.indexOf(item);
+        if (index !== -1) {
+          currentItem.country.splice(index, 1);
+        }
+      });
+    }
 
-    // Remove city
-    req.body.city.forEach((item) => {
-      let index = data.Items[0].city.indexOf(item);
-      if (index !== -1) {
-        data.Items[0].city.splice(index, 1);
-      }
-    });
+    if (req.body.stateLoc) {
+      req.body.stateLoc.forEach((item) => {
+        const index = currentItem.stateLoc.indexOf(item);
+        if (index !== -1) {
+          currentItem.stateLoc.splice(index, 1);
+        }
+      });
+    }
+
+    if (req.body.city) {
+      req.body.city.forEach((item) => {
+        const index = currentItem.city.indexOf(item);
+        if (index !== -1) {
+          currentItem.city.splice(index, 1);
+        }
+      });
+    }
 
     const updateExpression =
-      "set country =: country, stateLoc =: stateLoc, city =: city";
+      "set country = :country, stateLoc = :stateLoc, city = :city";
     const expressionAttributeValues = {
-      ":country": data.Items[0].country,
-      ":stateLoc": data.Items[0].stateLoc,
-      ":city": data.Items[0].city,
+      ":country": currentItem.country,
+      ":stateLoc": currentItem.stateLoc,
+      ":city": currentItem.city,
     };
     const updateParams = {
-      TableName: "schoolsTable",
+      TableName: WHITELIST_TABLE,
       Key: {
-        id: data.Items[0].id,
+        id: currentItem.id,
       },
       UpdateExpression: updateExpression,
       ExpressionAttributeValues: expressionAttributeValues,
@@ -149,58 +169,63 @@ const removeWhiteList = async (req, res) => {
     const updateCommand = new UpdateCommand(updateParams);
     await dynamoDocumentClient.send(updateCommand);
 
-    return res.status(200).json({
-      success: true,
-      message: "Successfully Remove WhiteList Data",
-    });
+    return sendSuccess(
+      res,
+      appConstants.HTTP_STATUS.OK,
+      "Successfully Removed WhiteList Data",
+    );
   } catch (error) {
-    return res.status(500).json({ success: false, error: `${error}` });
+    logger.error("Error in removeWhiteList", error);
+    return sendInternalError(res, "Failed to remove whitelist data", error);
   }
 };
 
 const checkWhiteList = async (req, res) => {
   try {
     const params = {
-      TableName: "whiteListTable",
+      TableName: WHITELIST_TABLE,
     };
 
     const command = new ScanCommand(params);
     const data = await dynamoDocumentClient.send(command);
 
-    if (data.Items.length === 0)
-      return res
-        .status(400)
-        .json({ success: false, error: "Please add WhiteList Data" });
-    //
-    let result = false;
+    if (!data.Items || data.Items.length === 0) {
+      return sendBadRequest(res, "Please add WhiteList Data");
+    }
 
-    if (req.query.country !== undefined)
-      if (!data.Items[0].country.includes(req.query.country)) {
-        result = true;
+    let isNotWhitelisted = false;
+    const currentItem = data.Items[0];
+
+    if (req.query.country !== undefined) {
+      if (!currentItem.country || !currentItem.country.includes(req.query.country)) {
+        isNotWhitelisted = true;
       }
+    }
 
-    // Update stateLoc
-    if (req.query.stateLoc !== undefined)
-      if (!data.Items[0].stateLoc.includes(req.query.stateLoc)) {
-        result = true;
+    if (req.query.stateLoc !== undefined) {
+      if (!currentItem.stateLoc || !currentItem.stateLoc.includes(req.query.stateLoc)) {
+        isNotWhitelisted = true;
       }
+    }
 
-    // Update city
-    if (req.query.city !== undefined)
-      if (!data.Items[0].city.includes(req.query.city)) {
-        result = true;
+    if (req.query.city !== undefined) {
+      if (!currentItem.city || !currentItem.city.includes(req.query.city)) {
+        isNotWhitelisted = true;
       }
+    }
 
-    if (result)
-      return res
-        .status(400)
-        .json({ success: false, error: "Location is not in the WhiteList" });
+    if (isNotWhitelisted) {
+      return sendBadRequest(res, "Location is not in the WhiteList");
+    }
 
-    return res
-      .status(200)
-      .json({ success: true, message: "Location is in the WhiteList" });
+    return sendSuccess(
+      res,
+      appConstants.HTTP_STATUS.OK,
+      "Location is in the WhiteList",
+    );
   } catch (error) {
-    return res.status(500).json({ success: false, error: `${error}` });
+    logger.error("Error in checkWhiteList", error);
+    return sendInternalError(res, "Failed to check whitelist", error);
   }
 };
 

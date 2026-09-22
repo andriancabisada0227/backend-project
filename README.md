@@ -1,6 +1,6 @@
-# SchoolRyde Backend Core
+#  Backend App Project
 
-The backend core service for the SchoolRyde platform. Built with **Node.js**, **Express**, **AWS DynamoDB**, **Firebase Cloud Messaging**, **Stripe**, and **Socket.io**.
+The backend App Project service for the platform. Built with **Node.js**, **Express**, **AWS DynamoDB**, **Firebase Cloud Messaging**, **Stripe**, and **Socket.io**.
 
 ---
 
@@ -19,7 +19,7 @@ The backend core service for the SchoolRyde platform. Built with **Node.js**, **
 
 ## Overview
 
-SchoolRyde Core manages driver and parent onboarding, route tracking, ride bookings, payment processing, student scheduling, real-time messaging, and push notifications.
+Backend App manages driver and parent onboarding, route tracking, ride bookings, payment processing, student scheduling, real-time messaging, and push notifications.
 
 Key integrations:
 - **AWS DynamoDB**: Main database engine for JSON documents and table stores.
@@ -158,11 +158,4 @@ All exceptions and operational events are logged through `logger.error()`, `logg
 OpenAPI / Swagger specs are located in `api-docs/`. When running the server, Swagger UI documentation is available at:
 `http://localhost:3000/api-docs`
 
----
 
-## Refactoring History & Documentation
-
-For details on refactoring progress and guidelines:
-- [REFACTORING_NOTES.md](file:///home/andre/Documents/repos/core/REFACTORING_NOTES.md) - Design patterns, standard function templates, and migration guide.
-- [DRIVERS_REFACTORING_SUMMARY.md](file:///home/andre/Documents/repos/core/DRIVERS_REFACTORING_SUMMARY.md) - Summary of drivers service refactoring Phase 1.
-- [DRIVERS_REFACTORING_PHASE2_COMPLETE.md](file:///home/andre/Documents/repos/core/DRIVERS_REFACTORING_PHASE2_COMPLETE.md) - Summary of drivers service refactoring Phase 2.

@@ -16,7 +16,7 @@ router.get("/", cors(),verifyToken, getAllServiceAreas);
 router.get("/:id", cors(),verifyToken, getServiceAreaById);
 router.post("/", cors(),verifyToken, addServiceArea);
 router.put("/:id", cors(),verifyToken, updateServiceArea);
-router.delete("s/:id", cors(),verifyToken, deleteServiceArea);
+router.delete("/:id", cors(),verifyToken, deleteServiceArea);
   
 
   

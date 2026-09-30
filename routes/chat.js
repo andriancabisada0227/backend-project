@@ -2,20 +2,18 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../services/token');
 const {
-  sendMessage,
-  getMessages,
-  getChatHistory,
-  markAsRead,
-  deleteMessage,
-  getUnreadCount
-} = require('../services/chat');
+  getAllChatsByUserId,
+  allChatRooms,
+  chatRoomsDetails,
+  deleteAllChatsByUserId,
+  deleteChatByChatId,
+  deleteSelectedChatsByUserId,
+} = require('../services/chatREST');
 
-// Chat routes
-router.post("/send", verifyToken, sendMessage);
-router.get("/history/:userId", verifyToken, getMessages);
-router.get("/conversations", verifyToken, getChatHistory);
-router.put("/read/:messageId", verifyToken, markAsRead);
-router.get("/unread", verifyToken, getUnreadCount);
-router.delete("/:messageId", verifyToken, deleteMessage);
+// Chat REST routes
+router.get("/chat/getall", verifyToken, getAllChatsByUserId);
+router.get("/chat/all/rooms", verifyToken, allChatRooms);
+router.get("/chat/details/:id", verifyToken, chatRoomsDetails);
+router.delete("/chat/delete/selected", verifyToken, deleteSelectedChatsByUserId);
 
 module.exports = router; 

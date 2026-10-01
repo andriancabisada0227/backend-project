@@ -1,5 +1,8 @@
 #  Backend App Project
 
+NOTICE. This app has been used for production before but as of now overall code is way way way way way different.
+I don't have any idea how they continue building the app. But this is mine. 
+
 The backend App Project service for the platform. Built with **Node.js**, **Express**, **AWS DynamoDB**, **Firebase Cloud Messaging**, **Stripe**, and **Socket.io**.
 
 ---

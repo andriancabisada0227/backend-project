@@ -1,7 +1,15 @@
-const AWS = require("aws-sdk");
+const { dynamoClient } = require("../config/aws");
+const {
+  DynamoDBDocumentClient,
+  BatchWriteCommand,
+  ScanCommand,
+  GetCommand,
+  UpdateCommand,
+  DeleteCommand,
+} = require("@aws-sdk/lib-dynamodb");
 const { v4: uuidv4 } = require("uuid");
 
-const dynamoDB = new AWS.DynamoDB.DocumentClient();
+const dynamoDB = DynamoDBDocumentClient.from(dynamoClient);
 const TABLE_NAME = "service_areas";
 
 // Create service area
@@ -34,7 +42,7 @@ const addServiceArea = async (req, res) => {
       }
     };
 
-    await dynamoDB.batchWrite(batchWriteParams).promise();
+    await dynamoDB.send(new BatchWriteCommand(batchWriteParams));
 
     return res.status(201).json({
       success: true,
@@ -51,13 +59,13 @@ const addServiceArea = async (req, res) => {
 // Get all service areas
 const getAllServiceAreas = async (req, res) => {
   try {
-    const result = await dynamoDB.scan({
-      TableName: 'service_areas'
-    }).promise();
+    const result = await dynamoDB.send(new ScanCommand({
+      TableName: TABLE_NAME
+    }));
 
     return res.status(200).json({
       success: true,
-      data: result.Items
+      data: result.Items || []
     });
   } catch (error) {
     return res.status(500).json({
@@ -72,10 +80,10 @@ const getServiceAreaById = async (req, res) => {
   try {
     const { id } = req.params;
     
-    const result = await dynamoDB.get({
-      TableName: 'service_areas',
+    const result = await dynamoDB.send(new GetCommand({
+      TableName: TABLE_NAME,
       Key: { id }
-    }).promise();
+    }));
 
     if (!result.Item) {
       return res.status(404).json({
@@ -101,16 +109,16 @@ const updateServiceArea = async (req, res) => {
   try {
     const { id } = req.params;
     const { zipCode } = req.body;
-    const postalCode = zipCode
-    const result = await dynamoDB.update({
-      TableName: 'service_areas',
+    const postalCode = zipCode;
+    const result = await dynamoDB.send(new UpdateCommand({
+      TableName: TABLE_NAME,
       Key: { id },
       UpdateExpression: "set postalCode = :postalCode",
       ExpressionAttributeValues: {
         ":postalCode": postalCode
       },
       ReturnValues: "ALL_NEW"
-    }).promise();
+    }));
 
     return res.status(200).json({
       success: true,
@@ -129,10 +137,10 @@ const deleteServiceArea = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await dynamoDB.delete({
-      TableName: 'service_areas',
+    await dynamoDB.send(new DeleteCommand({
+      TableName: TABLE_NAME,
       Key: { id }
-    }).promise();
+    }));
 
     return res.status(200).json({
       success: true,

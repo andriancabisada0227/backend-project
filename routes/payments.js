@@ -32,5 +32,6 @@ router.post("/payment/sheet/", verifyToken, paymentSheet);
 router.get("/payment/card/user/:id", verifyToken, getCardsByUserId);
 router.post("/payment/driver/payout", verifyToken, driverPayout);
 router.get('/payment-return', handlePaymentReturn);
+router.delete("/payment/stripe/account/:id", verifyToken, deleteStripeAccount);
 
 module.exports = router; 

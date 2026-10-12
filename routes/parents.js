@@ -20,19 +20,18 @@ const {
 } = require('../services/parents');
 
 // Parents routes
-router.get("/driver/latest", cors(), verifyToken, getLatestDriver);
-router.get("/:id", cors(), isTokenInvalidated, verifyToken, getParentById);
-router.get("/name/:parentName", cors(), verifyToken, getParentByName);
-router.get("/details/student/details", cors(), verifyToken, getParentDetailStudents);
-router.get("/confirmed/booking", cors(), verifyToken, getAllConfirmedParentsDriver);
-router.get("/students/confirmed", cors(), verifyToken, getConfirmedParentStudentDriver);
-router.put("/edit", cors(), verifyToken, editParent);
-router.post("/parent/edit", cors(), verifyToken, editParent);
+router.get("/parents/driver/latest", cors(), verifyToken, getLatestDriver);
+router.get("/parents/:id", cors(), isTokenInvalidated, verifyToken, getParentById);
+router.get("/parents/name/:parentName", cors(), verifyToken, getParentByName);
+router.get("/parents/details/student/details", cors(), verifyToken, getParentDetailStudents);
+router.get("/parents/confirmed/booking", cors(), verifyToken, getAllConfirmedParentsDriver);
+router.get("/parents/students/confirmed", cors(), verifyToken, getConfirmedParentStudentDriver);
 router.put("/parent/edit", cors(), verifyToken, editParent);
+router.post("/parent/edit", cors(), verifyToken, editParent);
 router.post("/parent/location/add", cors(), verifyToken, addParentLocation);
 router.post("/parent/image", cors(), verifyToken, addParentImage);
-router.post("/", cors(), verifyToken, addParent);
-router.delete("/:id", cors(), verifyToken, deleteParentById);
+router.post("/parents", cors(), verifyToken, addParent);
+router.delete("/parents/:id", cors(), verifyToken, deleteParentById);
 
 router.post('/assign-driver', verifyToken, parentController.asignDriver);
 module.exports = router; 

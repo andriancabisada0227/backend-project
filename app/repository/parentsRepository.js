@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, ScanCommand, UpdateCommand, GetCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, ScanCommand, UpdateCommand, GetCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 
 const { dynamoClient } = require("../../config/aws");
 const dynamoDocumentClient = DynamoDBDocumentClient.from(dynamoClient);
@@ -16,6 +16,28 @@ return result.Item;
 };
 
 const getParentByUserId = async (userId) => {
+  // Try QueryCommand first assuming standard GSI 'userId-index'
+  try {
+    const queryParams = {
+      TableName: tableName,
+      IndexName: "userId-index",
+      KeyConditionExpression: "#userId = :userId",
+      ExpressionAttributeNames: {
+        "#userId": "userId",
+      },
+      ExpressionAttributeValues: {
+        ":userId": userId,
+      },
+      Limit: 1,
+    };
+    const queryResult = await dynamoDocumentClient.send(new QueryCommand(queryParams));
+    if (queryResult.Items && queryResult.Items.length > 0) {
+      return queryResult.Items[0];
+    }
+  } catch (err) {
+    // GSI does not exist or index error, gracefully fall back to scan
+  }
+
   const params = {
     TableName: tableName,
     FilterExpression: "#userId = :userId",
@@ -25,11 +47,12 @@ const getParentByUserId = async (userId) => {
     ExpressionAttributeValues: {
       ":userId": userId,
     },
+    Limit: 1,
   };
 
   const command = new ScanCommand(params);
   const result = await dynamoDocumentClient.send(command);
-  return result.Items[0];
+  return result.Items && result.Items.length > 0 ? result.Items[0] : undefined;
 };
 
 const getParentsByDriverIdExcludingUserId = async (driverId, excludeUserId) => {

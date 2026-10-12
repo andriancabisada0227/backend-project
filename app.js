@@ -15,6 +15,7 @@ const driversYML = YAML.load("./api-docs/drivers.yml");
 const webYML = YAML.load("./api-docs/web.yml");
 
 const compressionMiddleware = require("./middleware/compression");
+const createRateLimiter = require("./middleware/rateLimiter");
 
 const app = express();
 
@@ -25,6 +26,14 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(helmet());
 app.use(cors());
 app.disable("x-powered-by");
+
+// Rate limit sensitive authentication endpoints: max 30 requests per minute
+const authRateLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  maxRequests: 30,
+  message: "Too many login/OTP requests from this IP. Please try again after a minute.",
+});
+app.use(["/email/SignIn", "/sendOtp", "/verifyOtp", "/refreshtoken"], authRateLimiter);
 
 const setCrossOriginOpenerPolicy = (req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "unsafe-none");

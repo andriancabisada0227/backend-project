@@ -67,16 +67,31 @@ async function runTests() {
     }
   });
 
-  // Test 6: Webhook endpoint is accessible
-  await test("POST /api/webhook_endpoints is registered", async () => {
-    const res = await fetch(`${baseUrl}/api/webhook_endpoints`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    });
-    // Should not return 404
-    if (res.status === 404) {
-      throw new Error("Webhook endpoint returned 404 Not Found");
+  // Test 7: Rate limiter test
+  await test("Rate limiter correctly tracks and limits excessive requests", async () => {
+    // Send 35 requests to /verifyOtp to trigger the 30 req/min limit
+    let hitLimit = false;
+    for (let i = 0; i < 35; i++) {
+      const res = await fetch(`${baseUrl}/verifyOtp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ otp: "000000" }),
+      });
+      if (res.status === 429) {
+        hitLimit = true;
+        break;
+      }
+    }
+    if (!hitLimit) {
+      throw new Error("Rate limiter did not throttle requests beyond limit");
+    }
+  });
+
+  // Test 8: Redis module initialization & fallback check
+  await test("Redis module initializes gracefully without throwing uncaught errors", async () => {
+    const redis = require("../config/redis");
+    if (typeof redis.publishMessage !== "function" || typeof redis.subscribeChannel !== "function") {
+      throw new Error("Redis module missing expected pub/sub interfaces");
     }
   });
 

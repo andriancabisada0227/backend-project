@@ -75,6 +75,19 @@ wss.on("connection", (ws, req) => {
   });
 });
 
+const { publishMessage, subscribeChannel } = require("../config/redis");
+const CHAT_CHANNEL = "ws:chat:messages";
+
+// Subscribe to Redis Pub/Sub to deliver messages from other workers to local sockets
+subscribeChannel(CHAT_CHANNEL, (messageData) => {
+  if (messageData && messageData.receiverUserID) {
+    const receiverWs = clients[messageData.receiverUserID];
+    if (receiverWs && receiverWs.readyState === WebSocket.OPEN) {
+      receiverWs.send(JSON.stringify(messageData));
+    }
+  }
+});
+
 // Add listeners for different events
 eventEmitter.on("newConnection", (ws, userID) => {
   clients[userID] = ws;
@@ -96,12 +109,14 @@ eventEmitter.on("messageReceived", (ws, message, userID) => {
       case "send":
         saveMessageToDynamoDB(messageData);
 
+        // Deliver locally if connected on this process
         const receiverWs = clients[messageData.receiverUserID];
         if (receiverWs && receiverWs.readyState === WebSocket.OPEN) {
           receiverWs.send(JSON.stringify(messageData));
-        } else {
-          console.log("Receiver not connected:", messageData.receiverUserID);
         }
+
+        // Publish to Redis channel so other worker processes can also deliver if recipient is on another core
+        publishMessage(CHAT_CHANNEL, messageData);
         break;
 
       default:

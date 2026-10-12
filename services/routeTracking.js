@@ -84,19 +84,36 @@ wss.on("connection", function connection(ws, req) {
   });
 });
 
-// Add listener to handle location updates
-eventEmitter.on("locationUpdate", (data, role, scheduleId) => {
-  // Handle location updates
+const { publishMessage, subscribeChannel } = require("../config/redis");
+const TRACKING_CHANNEL = "ws:tracking:location";
+
+// Handle local broadcast to connected clients
+function broadcastLocalLocation(data, role, scheduleId) {
   const clientsToUpdate = Object.values(clients).filter((client) => {
     return client.role !== role && client.scheduleID === scheduleId;
   });
 
-  // Send updates to filtered clients
   clientsToUpdate.forEach((client) => {
     if (client.ws && client.ws.readyState === WebSocket.OPEN) {
       client.ws.send(JSON.stringify(data));
     }
   });
+}
+
+// Subscribe to Redis Pub/Sub to deliver location updates broadcasted by other workers
+subscribeChannel(TRACKING_CHANNEL, (payload) => {
+  if (payload && payload.data && payload.scheduleId) {
+    broadcastLocalLocation(payload.data, payload.role, payload.scheduleId);
+  }
+});
+
+// Add listener to handle location updates from local sockets
+eventEmitter.on("locationUpdate", (data, role, scheduleId) => {
+  // 1. Broadcast locally
+  broadcastLocalLocation(data, role, scheduleId);
+
+  // 2. Publish to Redis so all other cluster workers broadcast to their clients
+  publishMessage(TRACKING_CHANNEL, { data, role, scheduleId });
 });
 
 module.exports = server;

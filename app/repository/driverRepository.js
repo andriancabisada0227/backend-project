@@ -1,4 +1,4 @@
-const { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, UpdateCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, UpdateCommand, DeleteCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 const { v4: uuidv4 } = require('uuid');
 
 const { dynamoClient } = require("../../config/aws");
@@ -15,6 +15,26 @@ return result.Item;
 };
 
 const getDriverByTaxiCode = async (taxiCode) => {
+  try {
+    const queryParams = {
+      TableName: tableName,
+      IndexName: "taxiCode-index",
+      KeyConditionExpression: "#taxiCode = :taxiCode",
+      ExpressionAttributeNames: {
+        "#taxiCode": "taxiCode",
+      },
+      ExpressionAttributeValues: {
+        ":taxiCode": taxiCode,
+      },
+    };
+    const queryResult = await dynamoDocumentClient.send(new QueryCommand(queryParams));
+    if (queryResult.Items) {
+      return queryResult.Items;
+    }
+  } catch (err) {
+    // Fall back to scan if index not present
+  }
+
   const params = {
     TableName: tableName,
     FilterExpression: "#taxiCode = :taxiCode",

@@ -30,20 +30,71 @@ async function startServer() {
 
   billingCronJob.start();
 
-  chatApp.listen(chatPORT, () => {
+  const chatServer = chatApp.listen(chatPORT, () => {
     console.log(`Chat Server is running on port ${chatPORT}`);
   });
 
-  app.listen(PORT, () => {
+  const restServer = app.listen(PORT, () => {
     console.log(`REST API Server is running on port ${PORT}`);
   });
 
-  rideTrackingApp.listen(3020, () => {
+  const trackingServer = rideTrackingApp.listen(3020, () => {
     console.log(`Ride Tracking Server is running on port 3020`);
   });
+
+  // Graceful shutdown handling
+  let isShuttingDown = false;
+  async function gracefulShutdown(signal) {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    console.log(`\nReceived ${signal}. Initiating graceful shutdown...`);
+
+    try {
+      if (billingCronJob && typeof billingCronJob.stop === 'function') {
+        billingCronJob.stop();
+        console.log('Stopped billing cron job.');
+      }
+    } catch (err) {
+      console.error('Error stopping cron job:', err);
+    }
+
+    const closeHttpServer = (serverInstance, name) => {
+      return new Promise((resolve) => {
+        if (!serverInstance || !serverInstance.close) return resolve();
+        serverInstance.close((err) => {
+          if (err) {
+            console.error(`Error closing ${name}:`, err);
+          } else {
+            console.log(`Closed ${name}.`);
+          }
+          resolve();
+        });
+      });
+    };
+
+    // Close servers in parallel with a timeout guarantee
+    const shutdownTimeout = setTimeout(() => {
+      console.warn('Forcefully terminating process after shutdown timeout.');
+      process.exit(1);
+    }, 10000);
+
+    await Promise.all([
+      closeHttpServer(restServer, 'REST API Server'),
+      closeHttpServer(chatServer, 'Chat Server'),
+      closeHttpServer(trackingServer, 'Ride Tracking Server'),
+    ]);
+
+    clearTimeout(shutdownTimeout);
+    console.log('Graceful shutdown complete.');
+    process.exit(0);
+  }
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
 
 startServer().catch(error => {
   console.error('Failed to start server:', error);
   process.exit(1);
 });
+

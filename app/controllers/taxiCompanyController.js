@@ -14,6 +14,7 @@ const dynamoDocumentClient = DynamoDBDocumentClient.from(dynamoClient);
 const taxiCompanyService = require('../services/taxiCompanyService');
 const notificationRepository = require('../repository/notificationRepository');
 const notificationService = require('../services/notificationService');
+const { enqueueEvent } = require('../../services/outbox');
 const scheduleRepository = require('../repository/scheduleRepository');
 const bookingRepository = require('../repository/bookingsRepository');
 const { v4: uuidv4 } = require('uuid');
@@ -655,11 +656,17 @@ const confirmBooking = async (req, res) => {
 
         const deviceTokenParent = await notificationRepository.GetDeviceToken(parent.userId);
         if(deviceTokenParent.length > 0 && deviceTokenParent[0].deviceToken){
-            await notificationService.sendNotification(
-                deviceTokenParent[0].deviceToken,
-                'Booking confirmed',
-                `Your booking has been confirmed. ${driver.driverName} has been assigned as your driver. Price for each ride is $${eachPrice}. Once we have more kids join the ride, your cost will be reduced.`
-            );
+            enqueueEvent("TAXI_BOOKING_CONFIRMED_NOTIFICATION", {
+                deviceToken: deviceTokenParent[0].deviceToken,
+                driverName: driver.driverName,
+                eachPrice,
+            }, async (payload) => {
+                await notificationService.sendNotification(
+                    payload.deviceToken,
+                    'Booking confirmed',
+                    `Your booking has been confirmed. ${payload.driverName} has been assigned as your driver. Price for each ride is $${payload.eachPrice}. Once we have more kids join the ride, your cost will be reduced.`
+                );
+            });
         }
 
         // Handle chat automation

@@ -24,6 +24,7 @@ const { getParentByUserId, getStudentsByDriverId } = require('../app/repository/
 const { getAllBookingsByUserId } = require('../app/repository/bookingsRepository');
 const { getDriverById } = require('../app/repository/driverRepository');
 const notificationService = require('../app/services/notificationService');
+const { enqueueEvent } = require('./outbox');
 
 const e = require("express");
 const startRide = async (req, res) => {
@@ -362,8 +363,13 @@ const endRide = async (req, res) => {
 
       const scanCommand = new ScanCommand(params);
       const userData = await dynamoDocumentClient.send(scanCommand);
-      if (userData.Items[0].deviceToken !== undefined)
-        await sendRideCompleted(userData.Items[0].deviceToken);
+      if (userData.Items && userData.Items.length > 0 && userData.Items[0].deviceToken !== undefined) {
+        enqueueEvent("RIDE_COMPLETED_NOTIFICATION", {
+          deviceToken: userData.Items[0].deviceToken,
+        }, async (payload) => {
+          await sendRideCompleted(payload.deviceToken);
+        });
+      }
     }
 
     return res.status(200).json({
@@ -938,38 +944,42 @@ const updateRideStatus = async (req, res) => {
 
           const scanCommand = new ScanCommand(params);
           const userData = await dynamoDocumentClient.send(scanCommand);
-          if (userData.Items.length !== 0) {
-            if (item.rideStatus === "PICKED_UP_HOME") {
-              await notificationService.sendNotification(
-                userData.Items[0].deviceToken, 
-                "Student picked up", 
-                `${userResult.Item.studentName} has arrived at your home.`
-              );
-            } else if (item.rideStatus === "DROPPED_OFF_SCHOOL") {
-              await notificationService.sendNotification(
-                userData.Items[0].deviceToken, 
-                "Student dropped off", 
-                `${userResult.Item.studentName} has arrived at school.`
-              );
-            } else if (item.rideStatus === "DROPPED_OFF_HOME") {
-              await notificationService.sendNotification(
-                userData.Items[0].deviceToken, 
-                "Student dropped off", 
-                `${userResult.Item.studentName} has arrived at your home.`
-              );
-            } else if (item.rideStatus === "PICKED_UP_SCHOOL") {
-              await notificationService.sendNotification(
-                userData.Items[0].deviceToken, 
-                "Student picked up", 
-                `${userResult.Item.studentName} has arrived at school.`
-              );
-            } else if (item.rideStatus === "DROPPED_OFF_SCHOOL") {
-              await notificationService.sendNotification(
-                userData.Items[0].deviceToken, 
-                "Student dropped off", 
-                `${userResult.Item.studentName} has arrived at school.`
-              );
-            }
+          if (userData.Items.length !== 0 && userData.Items[0].deviceToken) {
+            const token = userData.Items[0].deviceToken;
+            const studentName = userResult.Item ? userResult.Item.studentName : "Student";
+            const rideStatus = item.rideStatus;
+
+            enqueueEvent("STUDENT_STATUS_NOTIFICATION", {
+              token,
+              studentName,
+              rideStatus,
+            }, async (payload) => {
+              if (payload.rideStatus === "PICKED_UP_HOME") {
+                await notificationService.sendNotification(
+                  payload.token, 
+                  "Student picked up", 
+                  `${payload.studentName} has arrived at your home.`
+                );
+              } else if (payload.rideStatus === "DROPPED_OFF_SCHOOL") {
+                await notificationService.sendNotification(
+                  payload.token, 
+                  "Student dropped off", 
+                  `${payload.studentName} has arrived at school.`
+                );
+              } else if (payload.rideStatus === "DROPPED_OFF_HOME") {
+                await notificationService.sendNotification(
+                  payload.token, 
+                  "Student dropped off", 
+                  `${payload.studentName} has arrived at your home.`
+                );
+              } else if (payload.rideStatus === "PICKED_UP_SCHOOL") {
+                await notificationService.sendNotification(
+                  payload.token, 
+                  "Student picked up", 
+                  `${payload.studentName} has arrived at school.`
+                );
+              }
+            });
           }
         }
       }

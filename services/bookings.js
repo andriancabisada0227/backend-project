@@ -89,14 +89,14 @@ const createBooking = async (req, res) => {
         const command = new ScanCommand(params);
         const result = await dynamoDocumentClient.send(command);
 
-        if (result.Items.length !== 0) {
-          const deviceTokenChecker = await checkDeviceToken(
-            result.Items[0].deviceToken
-          );
-          if (deviceTokenChecker === true)
-            await sendParentSentBookingRequestNotification(
-              result.Items[0].deviceToken
-            );
+        if (result.Items.length !== 0 && result.Items[0].deviceToken) {
+          const targetToken = result.Items[0].deviceToken;
+          enqueueEvent("PARENT_SENT_BOOKING_NOTIFICATION", { deviceToken: targetToken }, async (payload) => {
+            const deviceTokenChecker = await checkDeviceToken(payload.deviceToken);
+            if (deviceTokenChecker === true) {
+              await sendParentSentBookingRequestNotification(payload.deviceToken);
+            }
+          });
         }
       }
     }

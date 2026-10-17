@@ -101,10 +101,51 @@ async function subscribeChannel(channel, callback) {
   }
 }
 
+/**
+ * Update driver geospatial position in Redis GEO set.
+ */
+async function updateDriverLocation(driverId, longitude, latitude) {
+  if (!isRedisAvailable || !publisher) return false;
+  try {
+    await publisher.geoAdd("drivers:locations", {
+      longitude: Number(longitude),
+      latitude: Number(latitude),
+      member: String(driverId),
+    });
+    return true;
+  } catch (err) {
+    console.warn(`[Redis GeoAdd Error] Driver ${driverId}:`, err.message);
+    return false;
+  }
+}
+
+/**
+ * Find drivers within radiusKm of longitude, latitude.
+ */
+async function getNearbyDrivers(longitude, latitude, radiusKm = 5) {
+  if (!isRedisAvailable || !publisher) return [];
+  try {
+    const results = await publisher.geoSearch("drivers:locations", {
+      longitude: Number(longitude),
+      latitude: Number(latitude),
+    }, {
+      radius: Number(radiusKm),
+      unit: "km",
+    });
+    return results || [];
+  } catch (err) {
+    console.warn("[Redis GeoSearch Error]:", err.message);
+    return [];
+  }
+}
+
 module.exports = {
   initRedis,
   publishMessage,
   subscribeChannel,
+  updateDriverLocation,
+  getNearbyDrivers,
   isAvailable: () => isRedisAvailable,
   getClient: () => publisher,
 };
+

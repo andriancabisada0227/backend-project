@@ -95,6 +95,30 @@ async function runTests() {
     }
   });
 
+  // Test 9: Redis GEO location indexing helpers exist and run safely
+  await test("Redis GEO spatial indexing functions handle offline and active states safely", async () => {
+    const { updateDriverLocation, getNearbyDrivers } = require("../config/redis");
+    // Should safely no-op when Redis is offline without crashing
+    const ok = await updateDriverLocation("driver-test-123", 120.9842, 14.5995);
+    const nearby = await getNearbyDrivers(120.9842, 14.5995, 5);
+    if (!Array.isArray(nearby)) {
+      throw new Error("Expected getNearbyDrivers to return an array");
+    }
+  });
+
+  // Test 10: Asynchronous Outbox dispatcher
+  await test("Outbox event dispatcher enqueues and executes background jobs", async () => {
+    const { enqueueEvent } = require("../services/outbox");
+    let jobExecuted = false;
+    const eventId = await enqueueEvent("TEST_JOB", { test: true }, async () => {
+      jobExecuted = true;
+    });
+    if (!eventId) throw new Error("Expected valid eventId from outbox");
+    // Wait briefly for event loop cycle
+    await new Promise((r) => setTimeout(r, 50));
+    if (!jobExecuted) throw new Error("Expected outbox job handler to be called");
+  });
+
   server.close();
 
   console.log(`\nResults: ${passed} passed, ${failed} failed`);

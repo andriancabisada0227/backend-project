@@ -388,6 +388,12 @@ const confirmBooking = async (req, res) => {
             data: req.body,
         });
     } catch (error) {
+        if (error.name === "ConditionalCheckFailedException") {
+            return res.status(409).json({
+                success: false,
+                error: "Booking has already been confirmed or is no longer in a waiting state.",
+            });
+        }
         return res.status(500).json({ success: false, error: `${error}` });
     }
 };

@@ -84,7 +84,7 @@ wss.on("connection", function connection(ws, req) {
   });
 });
 
-const { publishMessage, subscribeChannel } = require("../config/redis");
+const { publishMessage, subscribeChannel, updateDriverLocation } = require("../config/redis");
 const TRACKING_CHANNEL = "ws:tracking:location";
 
 // Handle local broadcast to connected clients
@@ -114,6 +114,16 @@ eventEmitter.on("locationUpdate", (data, role, scheduleId) => {
 
   // 2. Publish to Redis so all other cluster workers broadcast to their clients
   publishMessage(TRACKING_CHANNEL, { data, role, scheduleId });
+
+  // 3. If update contains driver GPS coordinates, index in Redis GEO for instant spatial queries
+  if (role === "taxiCompany" || data.driverId || data.userId) {
+    const driverId = data.driverId || data.userId || scheduleId;
+    const lng = data.longitude ?? data.lng;
+    const lat = data.latitude ?? data.lat;
+    if (driverId && lng != null && lat != null && !isNaN(lng) && !isNaN(lat)) {
+      updateDriverLocation(driverId, lng, lat);
+    }
+  }
 });
 
 module.exports = server;

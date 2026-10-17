@@ -123,9 +123,13 @@ const confirmBookingStatus = async (bookingId, status, driverId) => {
         TableName: "bookingsTable",
         Key: { id: bookingId },
         UpdateExpression: "set bookingStatus = :status, driverId = :driverId",
+        // Prevent race condition: only transition if booking is not already accepted
+        ConditionExpression: "attribute_not_exists(bookingStatus) OR bookingStatus = :waiting OR bookingStatus = :pending",
         ExpressionAttributeValues: {
             ":status": status,
-            ":driverId": driverId
+            ":driverId": driverId,
+            ":waiting": "WAITING",
+            ":pending": "PENDING",
         },
         ReturnValues: "UPDATED_NEW"
     };

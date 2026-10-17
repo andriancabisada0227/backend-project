@@ -27,6 +27,8 @@ const scheduleRepository = require("../app/repository/scheduleRepository");
 const driverRepository = require("../app/repository/driverRepository");
 const notificationRepository = require("../app/repository/notificationRepository");
 const parentsRepository = require("../app/repository/parentsRepository");
+const notificationService = require("../app/services/notificationService");
+const { enqueueEvent } = require("./outbox");
 
 const appConstants = require("./constants/appConstants");
 const {
@@ -334,20 +336,21 @@ const confirmBooking = async (req, res) => {
         // update parent driver
         await parentsRepository.updateParentDriver(booking.userId, booking.driverId);
         
-        // Send notification to parent
+        // Asynchronously dispatch notification to parent via Outbox
         if (booking.userId) {
-            const notifications = await notificationRepository.GetDeviceToken(booking.userId);
-            if (notifications.length > 0 && notifications[0].deviceToken) {
-                try {
-                  await notificationService.sendNotification(
-                    notifications[0].deviceToken, 
-                    "Booking accepted", 
-                    `your booking has been accepted by ${driver.driverName}. please check your schedule.`
-                  );
-                } catch (error) {
-                    console.log(error);
+            enqueueEvent("BOOKING_ACCEPTED_NOTIFICATION", {
+                userId: booking.userId,
+                driverName: driver ? driver.driverName : "your driver",
+            }, async (payload) => {
+                const notifications = await notificationRepository.GetDeviceToken(payload.userId);
+                if (notifications.length > 0 && notifications[0].deviceToken) {
+                    await notificationService.sendNotification(
+                        notifications[0].deviceToken, 
+                        "Booking accepted", 
+                        `your booking has been accepted by ${payload.driverName}. please check your schedule.`
+                    );
                 }
-            }
+            });
         }
 
         const allBookings = await bookingsRepository.getAllBookingsByUserId(booking.driverId, "ACCEPTED", booking.id);
@@ -361,18 +364,23 @@ const confirmBooking = async (req, res) => {
             } else {
               price = 15;
             }
+            
+            // Asynchronously dispatch price adjustment notifications via Outbox
             for (const b of allBookings) {
-              const notifParent = await notificationRepository.GetDeviceToken(b.userId);
-              if (notifParent.length > 0 && notifParent[0].deviceToken) {
-                try {
-                  await notificationService.sendNotification(
-                    notifParent[0].deviceToken, 
-                    "Price adjustment", 
-                    `you get new price adjustment for your booking. base price for each student: $${price}. Please check your schedule.`
-                  );
-                } catch (error) {
-                  console.log(error);
-                }
+              if (b.userId) {
+                enqueueEvent("PRICE_ADJUSTMENT_NOTIFICATION", {
+                  userId: b.userId,
+                  price,
+                }, async (payload) => {
+                  const notifParent = await notificationRepository.GetDeviceToken(payload.userId);
+                  if (notifParent.length > 0 && notifParent[0].deviceToken) {
+                    await notificationService.sendNotification(
+                      notifParent[0].deviceToken, 
+                      "Price adjustment", 
+                      `you get new price adjustment for your booking. base price for each student: $${payload.price}. Please check your schedule.`
+                    );
+                  }
+                });
               }
             }
         }
